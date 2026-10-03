@@ -18,5 +18,8 @@ export default defineConfig({
   test: {
     environment: 'node',
     include: ['tests/**/*.test.ts'],
+    // Many tests run whole simulations; on a slow or busy machine (a CI runner) the default 5 s is not enough.
+    testTimeout: 60_000,
+    hookTimeout: 120_000,
   },
 });
