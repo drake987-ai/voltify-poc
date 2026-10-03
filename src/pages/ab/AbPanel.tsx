@@ -5,6 +5,7 @@ import { EChart } from '@/components/charts/EChart';
 import { useChartColors } from '@/components/charts/useChartColors';
 import { RiskBadge } from '@/components/ui/RiskBadge';
 import type { Timeline } from '@/eval/timeline';
+import { formatNumber } from '@/lib/format';
 import { frameAt } from '@/lib/timelineSeries';
 import { buildAbOption, type AbSide } from './abChart';
 
@@ -31,7 +32,8 @@ function Chip({ icon, tone, children }: { icon: ReactNode; tone: 'ok' | 'warn' |
 }
 
 export function AbPanel({ timeline, side, tS, durationS }: AbPanelProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lang = i18n.resolvedLanguage ?? 'vi';
   const colors = useChartColors();
   const option = useMemo(
     () => buildAbOption({ timeline, side, tS, durationS, colors, t }),
@@ -108,7 +110,7 @@ export function AbPanel({ timeline, side, tS, durationS }: AbPanelProps) {
         <div>
           <p className="text-xs font-medium text-muted">{t('twin.readout.coreTemp')}</p>
           <p className="text-3xl font-semibold tracking-tight">
-            {frame ? frame.telemetry.coreTemp.toFixed(1) : '—'}
+            {frame ? formatNumber(frame.telemetry.coreTemp, lang, 1) : '—'}
             <span className="ml-1 text-base font-medium text-muted">°C</span>
           </p>
         </div>
@@ -117,7 +119,7 @@ export function AbPanel({ timeline, side, tS, durationS }: AbPanelProps) {
             <div>
               <p className="mb-1 text-xs font-medium text-muted">{t('twin.risk.title')}</p>
               <div className="flex items-center gap-2">
-                <span className="text-2xl font-semibold">{frame.assessment.risk.score.toFixed(0)}</span>
+                <span className="text-2xl font-semibold">{formatNumber(frame.assessment.risk.score, lang, 0)}</span>
                 <RiskBadge level={frame.assessment.risk.level} />
               </div>
             </div>

@@ -1,6 +1,6 @@
 import { Pause, Play, RotateCcw, SkipForward } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { PLAYBACK_SPEEDS, type Playback } from '@/hooks/usePlayback';
+import type { Playback } from '@/hooks/usePlayback';
 import { formatClock } from '@/lib/timelineSeries';
 
 /** Play / pause / replay, 1x-10x-60x speed, and a scrubber over the simulated run. */
@@ -28,7 +28,7 @@ export function PlaybackBar({ playback, durationS }: { playback: Playback; durat
       </div>
 
       <div role="group" aria-label={t('playback.speed')} className="inline-flex rounded-lg border border-border bg-surface-2 p-0.5 text-xs font-semibold">
-        {PLAYBACK_SPEEDS.map((s) => (
+        {playback.speeds.map((s) => (
           <button
             key={s}
             type="button"

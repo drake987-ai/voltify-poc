@@ -3,6 +3,7 @@ import type { Assessment } from '@/ai';
 import { AI_CONFIG } from '@/ai';
 import { Card } from '@/components/ui/Card';
 import { RiskBadge } from '@/components/ui/RiskBadge';
+import { formatNumber } from '@/lib/format';
 import { MODULES, MODULE_COLORS } from './moduleStyle';
 
 const BANDS = [
@@ -13,7 +14,8 @@ const BANDS = [
 ];
 
 export function RiskPanel({ assessment }: { assessment: Assessment | null }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const lang = i18n.resolvedLanguage ?? 'vi';
   const score = assessment?.risk.score ?? 0;
   const contributions = assessment?.risk.contributions;
 
@@ -22,7 +24,7 @@ export function RiskPanel({ assessment }: { assessment: Assessment | null }) {
       <h2 className="text-base font-semibold">{t('twin.risk.title')}</h2>
 
       <div className="mt-2 flex items-center gap-3">
-        <span className="text-5xl font-semibold tracking-tight">{score.toFixed(0)}</span>
+        <span className="text-5xl font-semibold tracking-tight">{formatNumber(score, lang, 0)}</span>
         <div className="space-y-1">
           {assessment ? <RiskBadge level={assessment.risk.level} /> : null}
           <p className="text-xs text-muted">{t('twin.risk.scoreOf')}</p>
@@ -65,7 +67,7 @@ export function RiskPanel({ assessment }: { assessment: Assessment | null }) {
           <li key={m} className="flex items-center gap-2">
             <span aria-hidden className="size-2.5 shrink-0 rounded-sm" style={{ background: MODULE_COLORS[m] }} />
             <span className="min-w-0 flex-1 truncate text-muted">{t(`twin.modules.${m}`)}</span>
-            <span className="font-semibold text-text">{(contributions?.[m] ?? 0).toFixed(1)}</span>
+            <span className="font-semibold text-text">{formatNumber(contributions?.[m] ?? 0, lang, 1)}</span>
           </li>
         ))}
       </ul>

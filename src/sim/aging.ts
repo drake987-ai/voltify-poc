@@ -13,6 +13,34 @@ export function fadePerEfc(tempC: number, eaJPerMol: number = AGING.eaJPerMol): 
   return AGING.kRefPerEfc * arrheniusFactor(tempC, AGING.refTempC, eaJPerMol);
 }
 
+export interface MixedLifetimeInput {
+  /** Capacity fade per equivalent full cycle while charging (already averaged over the charge), as from `fadePerEfc`. */
+  chargeFadePerEfc: number;
+  /** Average core temperature while riding, degC. */
+  rideTempC: number;
+  /** Share of an equivalent full cycle spent charging (the rest is discharge). */
+  chargeShare?: number;
+  efcPerDay: number;
+  eolSoh?: number;
+}
+
+export interface MixedLifetime {
+  fadePerEfc: number;
+  efcToEol: number;
+  daysToEol: number;
+}
+
+/**
+ * Lifetime of a pack that spends part of each cycle charging at one temperature and the rest
+ * riding at another: the fade per cycle is the share-weighted average of the two rates.
+ */
+export function projectMixedLifetime(input: MixedLifetimeInput): MixedLifetime {
+  const { chargeFadePerEfc, rideTempC, efcPerDay, chargeShare = 0.5, eolSoh = AGING.eolSoh } = input;
+  const fade = chargeShare * chargeFadePerEfc + (1 - chargeShare) * fadePerEfc(rideTempC);
+  const efcToEol = Math.max(0, 1 - eolSoh) / fade;
+  return { fadePerEfc: fade, efcToEol, daysToEol: efcPerDay > 0 ? efcToEol / efcPerDay : Number.POSITIVE_INFINITY };
+}
+
 export interface LifetimeInput {
   /** Average core temperature while cycling, degC. */
   coreTempC: number;

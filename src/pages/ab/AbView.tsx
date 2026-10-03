@@ -7,7 +7,6 @@ import { usePlayback } from '@/hooks/usePlayback';
 import { formatNumber } from '@/lib/format';
 import { formatClock } from '@/lib/timelineSeries';
 import { AbPanel } from './AbPanel';
-import { AB_DURATION_S } from './abConfig';
 import { EventLog, type LoggedEvent } from './EventLog';
 
 const peakUpTo = (frames: ABResult['bms']['frames'], tS: number): number => {
@@ -20,11 +19,12 @@ const peakUpTo = (frames: ABResult['bms']['frames'], tS: number): number => {
 };
 
 /** The replayable side-by-side comparison for one computed run (it restarts when remounted with a new run). */
-export function AbView({ ab }: { ab: ABResult }) {
+export function AbView({ ab, harshCase = true }: { ab: ABResult; /** The note about a deliberately harsh scenario applies (false when the viewer built their own). */ harshCase?: boolean }) {
   const { t, i18n } = useTranslation();
-  const playback = usePlayback(AB_DURATION_S, { autoplay: true, speed: 60 });
-  const { tS } = playback;
   const { bms, voltify, leadTimeS } = ab;
+  const durationS = bms.spec.durationS;
+  const playback = usePlayback(durationS, { autoplay: true, speed: 60 });
+  const { tS } = playback;
   const lang = i18n.resolvedLanguage ?? 'vi';
 
   const alertShown = voltify.summary.alertS !== null && voltify.summary.alertS <= tS;
@@ -62,7 +62,7 @@ export function AbView({ ab }: { ab: ABResult }) {
   else if (v.alertS === null && b.bmsTripS === null) verdict = t('ab.verdict.control');
   else if (v.bmsTripS !== null && b.bmsTripS !== null) {
     verdict = t('ab.verdict.stillTrips', { delay: minutes(v.bmsTripS - b.bmsTripS) });
-  } else if (leadTimeS !== null && v.swapS !== null && v.swapS < AB_DURATION_S * 10) {
+  } else if (leadTimeS !== null && v.swapS !== null && v.swapS < durationS * 10) {
     verdict = t('ab.verdict.protected', {
       lead: minutes(leadTimeS),
       peak: formatNumber(v.peakTempC, lang, 1),
@@ -74,11 +74,11 @@ export function AbView({ ab }: { ab: ABResult }) {
 
   return (
     <div className="space-y-4">
-      <PlaybackBar playback={playback} durationS={AB_DURATION_S} />
+      <PlaybackBar playback={playback} durationS={durationS} />
 
       <div className="grid gap-4 xl:grid-cols-2">
-        <AbPanel timeline={bms} side="bms" tS={tS} durationS={AB_DURATION_S} />
-        <AbPanel timeline={voltify} side="voltify" tS={tS} durationS={AB_DURATION_S} />
+        <AbPanel timeline={bms} side="bms" tS={tS} durationS={durationS} />
+        <AbPanel timeline={voltify} side="voltify" tS={tS} durationS={durationS} />
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
@@ -102,7 +102,7 @@ export function AbView({ ab }: { ab: ABResult }) {
         <Card>
           <h2 className="text-base font-semibold">{t('ab.notes.title')}</h2>
           <ul className="mt-3 list-disc space-y-2 pl-5 text-sm leading-relaxed text-muted">
-            <li>{t('ab.notes.severe')}</li>
+            {harshCase ? <li>{t('ab.notes.severe')}</li> : null}
             <li>
               {t('ab.notes.lead')}
               {leadTimeS !== null ? ` (${t('ab.kpi.leadValue', { minutes: minutes(leadTimeS) })})` : ''}

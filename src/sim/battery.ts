@@ -69,6 +69,8 @@ export interface LoadProfile {
   speedScale: number;
   /** If false the pack is parked at low SOC instead of going to charge (used by test scenarios). */
   autoCharge: boolean;
+  /** Charging rate in C of the pack's capacity (a fast-charge cabinet uses about 1 C). */
+  chargeCRate: number;
 }
 
 /** Fixed properties of one battery (unit-to-unit variation, route, driver). */
@@ -226,6 +228,7 @@ export function createBattery(a: CreateBatteryArgs): BatteryState {
     climbDuty: sc.load?.climbDuty ?? 0,
     speedScale: sc.load?.speedScale ?? 1,
     autoCharge: sc.load?.autoCharge ?? true,
+    chargeCRate: sc.load?.chargeCRate ?? CHARGING.cRate,
   };
 
   const config: BatteryConfig = {
@@ -263,7 +266,7 @@ export function createBattery(a: CreateBatteryArgs): BatteryState {
     efc: ((1 - soh) / fadePerEfc(AGING.refTempC)) * efcJitter,
     cellSoc,
     cellVrc: new Array<number>(n).fill(0),
-    mode: 'riding',
+    mode: sc.startMode ?? 'riding',
     idleLeftS: 0,
     stopLeftS: 0,
     speedMs: 0.8 * config.cruiseMs * load.speedScale,
@@ -391,13 +394,13 @@ export function stepBattery(b: BatteryState, env: Environment, control: BatteryC
       CHARGING.minTaper,
       1,
     );
-    iReq = -(CHARGING.cRate * capNomAh * b.soh * taper * clamp(control.chargeCurrentScale, 0, 1));
+    iReq = -(b.load.chargeCRate * capNomAh * b.soh * taper * clamp(control.chargeCurrentScale, 0, 1));
   } else {
     iReq = VEHICLE.auxW / vPackPrev;
   }
 
   if (b.bmsTripped) iReq = 0;
-  const iA = clamp(iReq, -CHARGING.cRate * capNomAh, VEHICLE.maxDischargeC * capNomAh);
+  const iA = clamp(iReq, -Math.max(CHARGING.cRate, b.load.chargeCRate) * capNomAh, VEHICLE.maxDischargeC * capNomAh);
 
   // ---- Internal short in one cell group ----
   let iShort = 0;

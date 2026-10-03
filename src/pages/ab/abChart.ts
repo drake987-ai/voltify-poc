@@ -5,6 +5,7 @@ import type { ChartColors } from '@/components/charts/useChartColors';
 import type { EChartsOption } from '@/components/charts/echarts';
 import type { Timeline, TimelineEventKind } from '@/eval/timeline';
 import { LIMIT_TEMP_C } from '@/ai';
+import { currentLang, formatNumber } from '@/lib/format';
 import { countUpTo, pairs, seriesOf } from '@/lib/timelineSeries';
 
 export type AbSide = 'bms' | 'voltify';
@@ -136,7 +137,7 @@ export function buildAbOption({ timeline, side, tS, durationS, colors, t }: Args
       backgroundColor: colors.surface,
       borderColor: colors.border,
       textStyle: { color: colors.text, fontSize: 12 },
-      valueFormatter: (v: unknown) => (typeof v === 'number' ? `${v.toFixed(1)} °C` : String(v)),
+      valueFormatter: (v: unknown) => (typeof v === 'number' ? `${formatNumber(v, currentLang(), 1)} °C` : String(v)),
       axisPointer: { type: 'line', lineStyle: { color: colors.muted } },
     },
     xAxis: {

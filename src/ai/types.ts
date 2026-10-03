@@ -69,7 +69,7 @@ export interface OverloadOutput {
   /** RMS C-rate / limit: above 1 the pack is being worked past its derating curve. */
   ratio: number;
   hotCharge: boolean;
-  /** Suggested discharge-power cut (0..0.3) and charging-current multiplier (0..1). */
+  /** Suggested discharge-power cut (0..0.3) and, while charging, a multiplier on the CURRENT charging current (0..1). */
   recommendedDerate: number;
   recommendedChargeScale: number;
 }

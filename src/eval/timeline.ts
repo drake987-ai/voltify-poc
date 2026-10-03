@@ -11,8 +11,11 @@ import { normalize, type Brand, type Telemetry } from '../adapters';
 import { createEngine, ingest, type Assessment } from '../ai';
 import {
   DEFAULT_POLICY,
+  createCabinet,
   createIntervention,
+  stepCabinet,
   stepIntervention,
+  type CabinetEvent,
   type InterventionEventKind,
   type InterventionPolicy,
 } from '../intervention';
@@ -24,11 +27,19 @@ import {
   stepFleet,
   truthOf,
   type BatteryControl,
+  type City,
   type FaultSpec,
+  type Mode,
   type ScenarioSelection,
 } from '../sim';
 
-export type WorldMode = 'bms' | 'voltify' | 'observe';
+/**
+ * 'bms'      traditional BMS alone (no AI, no commands)
+ * 'voltify'  AI watches and the vehicle intervention policy acts (power cut, swap)
+ * 'observe'  AI watches, nothing acts
+ * 'cabinet'  AI watches a pack on charge and cuts the cabinet's charging current when it is hot
+ */
+export type WorldMode = 'bms' | 'voltify' | 'observe' | 'cabinet';
 
 export interface TimelineSpec {
   scenario: ScenarioSelection;
@@ -36,6 +47,11 @@ export interface TimelineSpec {
   /** Fleet size; the monitored battery is the first one of `brand` (default 12). */
   n?: number;
   brand: Brand;
+  /** Monitor this battery instead of the first one of `brand` (only it is simulated). */
+  batteryId?: string;
+  /** Per-battery scenarios, as in a live fleet. */
+  overrides?: Readonly<Record<string, ScenarioSelection>>;
+  city?: City | 'both';
   durationS: number;
   mode: WorldMode;
   policy?: InterventionPolicy;
@@ -49,9 +65,12 @@ export interface TruthSample {
   qFaultW: number;
   soh: number;
   speedKmh: number;
+  mode: Mode;
   bmsTripped: boolean;
   parked: boolean;
   derate: number;
+  /** Multiplier applied to the charging current (1 = full). */
+  chargeScale: number;
 }
 
 export interface TimelineFrame {
@@ -93,18 +112,34 @@ export interface Timeline {
   spec: TimelineSpec;
   batteryId: string;
   brand: Brand;
+  /** Where the monitored battery operates (for station look-ups and maps). */
+  city: City;
   frames: TimelineFrame[];
   events: TimelineEvent[];
+  /** Commands sent to the charging cabinet ('cabinet' mode only). */
+  cabinetEvents: CabinetEvent[];
   summary: TimelineSummary;
 }
 
 export function runTimeline(spec: TimelineSpec): Timeline {
-  const fleet = createFleet({ seed: spec.seed, n: spec.n ?? 12, scenario: spec.scenario });
-  const battery = fleet.batteries.find((b) => b.config.brand === spec.brand) ?? fleet.batteries[0];
+  const serial = spec.batteryId ? Number.parseInt(spec.batteryId.slice(2), 10) : 0;
+  const fleet = createFleet({
+    seed: spec.seed,
+    n: Math.max(spec.n ?? 12, serial),
+    scenario: spec.scenario,
+    city: spec.city,
+    overrides: spec.overrides,
+    only: spec.batteryId ? [spec.batteryId] : undefined,
+  });
+  const battery = spec.batteryId
+    ? fleet.batteries[0]
+    : (fleet.batteries.find((b) => b.config.brand === spec.brand) ?? fleet.batteries[0]);
+  if (!battery) throw new Error(`battery ${spec.batteryId ?? spec.brand} does not exist in this fleet`);
   const id = battery.config.id;
   const policy = spec.policy ?? DEFAULT_POLICY;
   const engine = spec.mode === 'bms' ? null : createEngine();
   const intervention = createIntervention();
+  const cabinet = createCabinet();
 
   const frames: TimelineFrame[] = [];
   let control: BatteryControl | undefined;
@@ -133,6 +168,8 @@ export function runTimeline(spec: TimelineSpec): Timeline {
           { tS, level: assessment.risk.level, lat: telemetry.lat, lng: telemetry.lng, city: battery.config.city },
           policy,
         );
+      } else if (assessment && spec.mode === 'cabinet') {
+        control = stepCabinet(cabinet, assessment, tS);
       }
       if (assessment && alertS === null && RISK_RANK[assessment.risk.level] >= RISK_RANK[policy.alertLevel]) alertS = tS;
 
@@ -146,9 +183,11 @@ export function runTimeline(spec: TimelineSpec): Timeline {
           qFaultW: truth.qFaultW,
           soh: truth.soh,
           speedKmh: battery.speedMs * 3.6,
+          mode: truth.mode,
           bmsTripped: truth.bmsTripped,
           parked: control?.parked === true,
           derate: control?.derate ?? 0,
+          chargeScale: control?.chargeCurrentScale ?? 1,
         },
       });
     }
@@ -181,8 +220,10 @@ export function runTimeline(spec: TimelineSpec): Timeline {
     spec,
     batteryId: id,
     brand: battery.config.brand,
+    city: battery.config.city,
     frames,
     events,
+    cabinetEvents: cabinet.events,
     summary: {
       alertS,
       bmsTripS: truthEnd.bmsTrippedAtS,

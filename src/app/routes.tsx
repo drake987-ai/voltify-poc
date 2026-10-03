@@ -15,17 +15,17 @@ import {
 } from 'lucide-react';
 import { matchPath } from 'react-router-dom';
 import type { PageId } from '@/lib/pageIds';
-import CrossBrandPage from '@/pages/CrossBrandPage';
-import EvidencePage from '@/pages/EvidencePage';
-import FleetPage from '@/pages/FleetPage';
-import InterventionPage from '@/pages/InterventionPage';
-import MarketPage from '@/pages/MarketPage';
-import RoiPage from '@/pages/RoiPage';
-import SandboxPage from '@/pages/SandboxPage';
 import StoryPage from '@/pages/StoryPage';
 import VitalsPage from '@/pages/VitalsPage';
 
-// Screens that draw charts are loaded on demand so the charting library stays out of the first load.
+// Screens that draw charts or a map are loaded on demand so those libraries stay out of the first load.
+const FleetPage = lazy(() => import('@/pages/FleetPage'));
+const InterventionPage = lazy(() => import('@/pages/InterventionPage'));
+const CrossBrandPage = lazy(() => import('@/pages/CrossBrandPage'));
+const RoiPage = lazy(() => import('@/pages/RoiPage'));
+const EvidencePage = lazy(() => import('@/pages/EvidencePage'));
+const MarketPage = lazy(() => import('@/pages/MarketPage'));
+const SandboxPage = lazy(() => import('@/pages/SandboxPage'));
 const TwinPage = lazy(() => import('@/pages/TwinPage'));
 const BmsVsVoltifyPage = lazy(() => import('@/pages/BmsVsVoltifyPage'));
 
@@ -60,7 +60,15 @@ export const ROUTES: readonly AppRoute[] = [
     element: <TwinPage />,
   },
   { id: 'bms', path: '/bms-vs-voltify', icon: Scale, group: 'platform', stage: 4, element: <BmsVsVoltifyPage /> },
-  { id: 'vitals', path: '/vitals', icon: HeartPulse, group: 'platform', stage: 5, element: <VitalsPage /> },
+  {
+    id: 'vitals',
+    path: '/vitals',
+    extraPaths: ['/vitals/:batteryId'],
+    icon: HeartPulse,
+    group: 'platform',
+    stage: 5,
+    element: <VitalsPage />,
+  },
   { id: 'intervention', path: '/intervention', icon: BellRing, group: 'platform', stage: 5, element: <InterventionPage /> },
   { id: 'crossBrand', path: '/cross-brand', icon: Network, group: 'platform', stage: 6, element: <CrossBrandPage /> },
   { id: 'roi', path: '/roi', icon: Calculator, group: 'business', stage: 6, element: <RoiPage /> },

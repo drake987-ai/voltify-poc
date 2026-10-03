@@ -51,7 +51,6 @@
     "pocNotice": "This PoC runs entirely in the browser with no backend. Figures are simulated unless a screen says it uses real data."
   },
   "common": {
-    "comingInStage": "This screen is built in stage {{stage}}.",
     "notFoundTitle": "Page not found",
     "notFoundBody": "This path does not exist in the demo.",
     "backToFleet": "Back to Overview"
@@ -59,7 +58,8 @@
   "state": {
     "loadingPage": "Loading the screen…",
     "loading": "Running the simulation in a Web Worker…",
-    "error": "The simulation could not run: {{message}}"
+    "error": "The simulation could not run: {{message}}",
+    "loadingFleet": "Starting the simulated fleet…"
   },
   "brands": {
     "A": "Brand A (Selex-like)",
@@ -315,6 +315,17 @@
       "isolate": "Isolate this pack after the swap",
       "reduce_charge": "Reduce charging current to {{percent}}%",
       "schedule_maintenance": "Schedule service or move to short trips"
+    },
+    "live": {
+      "note": "This is the history of this pack in the fleet on the Overview screen, rebuilt from the same seed {{seed}} and the same intervention policy, so it matches that screen reading for reading, including when Voltify cut power or swapped the pack.",
+      "backToCases": "See the sample cases",
+      "notFound": "The current fleet has no pack {{id}}."
+    },
+    "fromEvidence": {
+      "note": "This is pack {{id}} of a run on the Evidence screen (scenario {{scenario}}, seed {{seed}}), replayed with the AI only watching and nothing acting.",
+      "short": "An internal short starts at minute {{minutes}} and its resistance falls to {{ohm}} ohm.",
+      "back": "Back to Evidence",
+      "invalid": "The case link is not valid, so a sample case is shown."
     }
   },
   "pages": {
@@ -361,6 +372,1273 @@
     "market": {
       "title": "Market and Business",
       "subtitle": "TAM/SAM/SOM, competitor comparison, UVP, Unfair Advantage, revenue model and roadmap."
+    }
+  },
+  "assumptions": {
+    "packCostVnd": {
+      "label": "Replacement cost of one pack",
+      "why": "A reference price for a swappable pack; a pilot replaces it with the customer's contract price."
+    },
+    "packDamageFraction": {
+      "label": "Share of pack value lost when overheated",
+      "why": "Value lost to faster ageing or write-off when a pack is pushed toward 65°C. An illustrative assumption with no pilot data behind it yet."
+    },
+    "strandedCostVnd": {
+      "label": "Cost of one vehicle stopped on the road",
+      "why": "Covers late orders, a recovery trip and lost shift time. An illustrative assumption."
+    },
+    "rideTempC": {
+      "label": "Average core temperature while riding",
+      "why": "Used for the Arrhenius lifetime projection: the hotter the pack, the faster it ages."
+    },
+    "efcPerDay": {
+      "label": "Equivalent full cycles per day",
+      "why": "One equivalent full cycle (EFC) is one full discharge of the rated capacity. The default is an illustrative assumption."
+    },
+    "chargeShare": {
+      "label": "Share of each cycle spent charging",
+      "why": "The part of each equivalent full cycle spent charging (the rest is discharge); used to project lifetime when comparing charging cabinets."
+    }
+  },
+  "fleet": {
+    "controls": {
+      "reset": "Reset",
+      "size": "Fleet size",
+      "sizes": {
+        "300": "300 packs (default)",
+        "2000": "2,000 packs (map performance test)"
+      },
+      "clock": "Simulation clock",
+      "effective": "actual speed {{speed}}×",
+      "paused": "paused",
+      "seed": "seed {{seed}}"
+    },
+    "map": {
+      "aria": "Map of every pack's position and risk level",
+      "offline": "Offline: the OpenStreetMap background could not be loaded, showing a plain grid.",
+      "cityHcmc": "Ho Chi Minh City",
+      "cityHanoi": "Hanoi",
+      "legendTitle": "Risk level key (shape plus colour)",
+      "note": "{{n}} simulated packs moving along made-up routes. Click a point for details."
+    },
+    "filters": {
+      "city": "City",
+      "brand": "Battery brand"
+    },
+    "kpi": {
+      "meanSoh": "Mean State of Health (SOH)",
+      "alerts": "Alerts raised",
+      "swaps": "Packs swapped",
+      "prevented": "Incidents prevented",
+      "savings": "Estimated savings",
+      "ofTotal": "of {{total}} packs",
+      "clickHint": "Click for the formula"
+    },
+    "units": {
+      "millionVnd": "{{value}} million VND",
+      "vnd": "{{value}} VND"
+    },
+    "trace": {
+      "title": "How it is calculated: {{name}}",
+      "close": "Close",
+      "names": {
+        "levels": "packs by risk level",
+        "meanSoh": "mean State of Health (SOH)",
+        "alerts": "alerts raised",
+        "swaps": "packs swapped",
+        "prevented": "incidents prevented",
+        "savings": "estimated savings"
+      },
+      "formulas": {
+        "levels": "Packs are counted by their current Risk Score: Safe below 25, Watch from 25, Warning from 50, Danger from 75 (with hysteresis so the level does not flicker). Packs the AI is still learning count as Safe until it has enough data.",
+        "meanSoh": "Mean SOH estimated from internal resistance (RLS, referred to 25°C) over packs past the learning phase. Packs still learning are left out. This is an estimate on simulated data.",
+        "alerts": "The number of times a pack rose to the Warning level (Risk Score of 50 or more) since the simulation started. Each change of level counts once.",
+        "swaps": "Packs swapped at a station under the intervention policy: alert, derate by 15% after 10 s, notify the shipper, swap after the shipper's reaction time plus the ride to the station plus 90 s of handling.",
+        "prevented": "Incidents prevented = packs a traditional BMS cut off at 65°C in the control fleet (same seed, same scenario, no intervention) that were not cut off in the Voltify fleet. Only what is measured in the simulation is counted.",
+        "savings": "Savings = incidents prevented × (pack cost × share of value lost when overheated + cost of one vehicle stopped on the road). The factors are illustrative assumptions, listed below."
+      },
+      "tripsBaseline": "BMS cut-offs, control fleet",
+      "tripsVoltify": "BMS cut-offs, Voltify fleet",
+      "packLoss": "Pack value kept ({{count}} incidents)",
+      "stranded": "Stranded-vehicle cost avoided ({{count}} incidents)",
+      "assumptions": "Assumptions (illustrative)",
+      "placeholder": "These are illustrative assumptions so the PoC can run, not real customer figures. A pilot replaces them with real numbers; the ROI screen lets you edit them.",
+      "counterfactual": "The control fleet runs alongside in the same simulation with no intervention at all, so this number is a direct comparison, not a guess."
+    },
+    "alerts": {
+      "title": "Live alerts",
+      "empty": "No alerts yet. An alert appears when a pack rises to the Warning level."
+    },
+    "selected": {
+      "title": "Selected pack",
+      "none": "Click a point on the map or an alert to see its details.",
+      "roleLabel": "Role in the simulation",
+      "roles": {
+        "normal": "Normal operation on a 43°C day.",
+        "severe": "Overload in the heat: aged pack, heavy load, steep climb.",
+        "short": "An internal short is injected part-way through the run.",
+        "heavy": "Heavy load and climbing.",
+        "aged": "Heavily aged pack.",
+        "weakCell": "Has an imbalanced cell."
+      },
+      "openTwin": "Open Digital Twin",
+      "openVitals": "Open the four vital signs",
+      "status": {
+        "learning": "AI is learning",
+        "derating": "Power cut by 15%",
+        "swapped": "Pack swapped",
+        "tripped": "BMS has cut off"
+      }
+    }
+  },
+  "vitals": {
+    "controls": {
+      "battery": "Choose a pack",
+      "hint": "This is the same fleet that runs on the Overview screen, so the figures follow the simulation clock. Speed and pause are set on the Overview screen."
+    },
+    "soc": {
+      "title": "State of Charge (SOC)",
+      "explain": "SOC is the energy left compared with full, like the fuel gauge of a vehicle. Voltify estimates the minutes of riding left from recent consumption and sets that beside the distance to the nearest battery-swap station.",
+      "idle": "The vehicle is almost unloaded, so the remaining riding time cannot be estimated yet.",
+      "remaining": "About {{minutes}} minutes of riding left at the recent load.",
+      "station": "Nearest swap station {{id}}: {{distance}} m away, about {{minutes}} minutes of riding.",
+      "alertReach": "Charge is low for the distance to the station: swap now.",
+      "alertSwap": "The pack is nearly flat: swap at the nearest station."
+    },
+    "health": {
+      "title": "State of Health (SOH)",
+      "explain": "SOH shows how much of its original capacity the pack can still use. Voltify estimates it from internal resistance: the more aged the pack, the higher its resistance. The class puts good packs on long routes and weak ones on short trips or in for service.",
+      "route": {
+        "long": "Suitable for long routes.",
+        "medium": "Suitable for medium trips.",
+        "short": "Keep to short trips or send for service."
+      },
+      "confidence": "Estimate confidence: {{percent}}%"
+    },
+    "safety": {
+      "title": "Safety and fire risk",
+      "explain": "Risk Score (0 to 100) combines the four AI modules: thermal trend, cell voltage, overload and internal resistance. The higher the score, the sooner action is needed. The signals contributing most are listed below.",
+      "noEta": "No forecast crossing of 65°C.",
+      "eta": "Forecast to reach 65°C in about {{minutes}} minutes if the load stays the same."
+    },
+    "discharge": {
+      "title": "Discharge performance",
+      "explain": "The discharge score shows how well the pack delivers power. High resistance turns energy into heat; a weak cell or an imbalance between cells cuts the usable power. Each cause is deducted with a fixed weight (50% resistance, 25% weak cell, 25% imbalance).",
+      "efficiency": "Power delivery efficiency",
+      "idleLoad": "no load",
+      "loss": "Power lost as heat",
+      "parts": "Points deducted for",
+      "points": "−{{points}} points",
+      "penalty": {
+        "resistance": "High resistance",
+        "weakCell": "Weak cell",
+        "balance": "Cell imbalance"
+      },
+      "balance": "Run a cell-balancing cycle on this pack at its next charge; this is maintenance, not a fire risk."
+    },
+    "fleet": {
+      "title": "Whole fleet: distribution of the four vital signs",
+      "soc": "State of Charge (SOC)",
+      "health": "State of Health (SOH)",
+      "safety": "Risk level",
+      "discharge": "Discharge score",
+      "dischargeNote": "Packs the AI is still learning are left out."
+    }
+  },
+  "intervention": {
+    "phases": {
+      "title": "Two stages of rollout (Known limits & Roadmap)",
+      "one": "Stage 1 (pilot): monitoring and alerts only. Voltify notifies the shipper and the fleet manager through an app and does not control the vehicle, so no control access from the vehicle maker is needed.",
+      "two": "Stage 2: send commands back to the vehicle (for example a 15% discharge-power cut) and to the charging cabinet. This needs a technical agreement with the vehicle maker and the BMS maker. This screen simulates both stages to show the value of acting."
+    },
+    "controls": {
+      "hint": "Choose a battery brand to follow the intervention of one pack of that brand. The vehicle uses the same scenario and seed as the BMS-vs-Voltify screen, so the figures on the two screens can be checked against each other."
+    },
+    "vehicle": {
+      "title": "A vehicle on the road: from alert to swap",
+      "intro": "A 43°C day, an aged pack, a heavy load and a climb. When the Risk Score reaches the Warning level, Voltify sends a power cut down to the vehicle, tells the shipper to swap at the nearest station that has a cool pack, and records the swap. Every time shown comes from the simulation.",
+      "stats": {
+        "derate": "Power cut sent at",
+        "derateHint": "{{percent}}% less discharge power, after the command delay",
+        "swap": "Swap completed at",
+        "swapHint": "After the shipper reacts, rides to the station and the packs are exchanged",
+        "peak": "Highest core temperature",
+        "peakHint": "Up to the moment being played"
+      },
+      "logTitle": "Log of commands sent to the vehicle",
+      "policyTitle": "Intervention procedure (simulation parameters)",
+      "policy": {
+        "alert": "The AI sees the Risk Score reach the Warning level (50 points or more).",
+        "derate": "After {{seconds}} s (the delay from the cloud to the vehicle maker's server to the BMS) the {{percent}}% discharge-power cut takes effect.",
+        "notify": "At the same time the shipper app gets a notification with the nearest station that has a cool pack; a cool pack is held for them.",
+        "swap": "The shipper reacts after {{reaction}} s, rides at {{speed}} km/h in a straight line to the station, then the swap takes {{handling}} s."
+      }
+    },
+    "phone": {
+      "aria": "Mockup of the shipper's app",
+      "fine": "Pack is stable",
+      "fineHint": "The app only speaks up when Voltify sees something to act on. Press Play to see what happens.",
+      "alertTitle": "Pack unusually hot: swap needed",
+      "alertBody": "Core temperature {{temp}} °C and rising. The system has cut power by {{percent}}% to keep it safe. Swap the pack at station {{station}}, {{distance}} m away. A cool pack is being held for you.",
+      "alertBodyNoStation": "The pack is unusually hot. The system has cut power by {{percent}}%. Swap the pack at the nearest station.",
+      "doneTitle": "Pack swapped",
+      "doneBody": "The hot pack stays at the station to cool, with no load. You can carry on delivering.",
+      "mapAria": "Diagram of the straight line from your position to the swap station",
+      "caption": "Mockup of the shipper app. The route is the straight line the simulation assumes, not real navigation.",
+      "steps": {
+        "derate": "Power cut by {{percent}}%",
+        "ride": "Ride to station {{station}} ({{distance}} m to go)",
+        "rideNearest": "Ride to the nearest swap station",
+        "swap": "Swap the pack at the station",
+        "resume": "Carry on delivering",
+        "arrived": "Arrived at station {{station}}"
+      },
+      "tabs": {
+        "pack": "Pack",
+        "stations": "Stations",
+        "orders": "Orders"
+      },
+      "appName": "Voltify Rider"
+    },
+    "log": {
+      "note": "Example message formats produced by the simulation for illustration; the real protocol depends on each vehicle maker and BMS.",
+      "empty": "No command has been sent yet. Press Play to run the scenario.",
+      "channels": {
+        "platform": "Voltify platform",
+        "vehicle": "Vehicle / BMS",
+        "app": "Shipper app",
+        "station": "Swap station",
+        "cabinet": "Charging cabinet"
+      },
+      "kinds": {
+        "ai_alert": "Voltify alert: Risk Score reached the Warning level",
+        "derate_sent": "Discharge-power cut sent to the vehicle",
+        "shipper_notified": "Push notification to the shipper: swap at the station holding a cool pack",
+        "shipper_notified_nostation": "Push notification to the shipper: swap at the nearest station",
+        "swap_done": "Station confirms the swap; the hot pack stays behind to cool",
+        "bms_trip": "BMS cut the power because the core reached 65°C",
+        "vehicle_stopped": "The vehicle stopped on the road",
+        "charge_reduced": "Charging-current cut sent to the cabinet",
+        "charge_adjusted": "Charging-current adjustment",
+        "charge_restored": "Charging current returned to full (the pack cooled or the charge ended)"
+      }
+    },
+    "cabinet": {
+      "title": "Charging cabinet: cutting the charge current when the pack is too hot",
+      "intro": "The same pack, seed and fast-charging cabinet standing in the sun, run twice: an ordinary cabinet, and a cabinet where Voltify reduces the charging current along the temperature derating curve. The two runs are identical up to the first command.",
+      "worlds": {
+        "without": "Ordinary cabinet",
+        "with": "Cabinet with Voltify"
+      },
+      "slot": "slot {{slot}}",
+      "currentNow": "Charge current",
+      "status": {
+        "idle": "Idle",
+        "finished": "Charge finished",
+        "reduced": "Current cut to {{percent}}% of the request",
+        "hot": "Charging, pack hot",
+        "charging": "Charging"
+      },
+      "axisTime": "Charging time (min)",
+      "axisTemp": "Core temperature (°C)",
+      "axisCurrent": "Charge current (A)",
+      "chartTemp": "Core temperature while charging",
+      "chartCurrent": "Charge current",
+      "marks": {
+        "charge_reduced": "Current cut",
+        "charge_adjusted": "Current adjusted",
+        "charge_restored": "Current restored"
+      },
+      "notFull": "not full within the simulation",
+      "minutes": "{{minutes}} min",
+      "days": "{{days}} days",
+      "kpi": {
+        "title": "The two charges compared",
+        "change": "Change",
+        "peak": "Highest core temperature while charging",
+        "mean": "Mean core temperature while charging",
+        "full": "Time to 98% SOC",
+        "fade": "Capacity fade per cycle (during the charge)",
+        "life": "Projected pack life (to SOH 80%)"
+      },
+      "trace": {
+        "title": "How the projected life is calculated",
+        "formula": "Fade per equivalent cycle = charge share × fade while charging + (1 − charge share) × fade while riding. Cycles to SOH 80% = 20% / fade per cycle. Days = cycles / cycles per day. The fade while charging is measured in the simulation (current-weighted mean); the fade while riding follows the Arrhenius equation at the assumed riding temperature.",
+        "chargeFade": "Fade while charging: {{world}}",
+        "rideFade": "Fade while riding at {{temp}}°C",
+        "mixedFade": "Fade per cycle: {{world}}",
+        "efc": "Cycles to SOH 80%: {{world}}"
+      },
+      "logTitle": "Log of commands sent to the cabinet",
+      "notes": {
+        "title": "Worth knowing",
+        "scenario": "Scenario: a fast-charging (1C) cabinet standing in the sun, 46 to 50°C inside, an aged pack (SOH 78%) put on charge a few degrees hotter than the surroundings. A deliberately harsh case.",
+        "tradeoff": "Trade-off: keeping the pack inside the derating curve makes the charge take about {{ratio}} times as long as charging at full current.",
+        "tradeoffUnknown": "Trade-off: one of the two charges did not reach full within the simulation.",
+        "projection": "The roughly {{gain}}% longer life is a projection from the Arrhenius ageing model with the assumptions above, not a measured result. The target of about 35% longer pack life has to be confirmed in a pilot.",
+        "cooling": "Cutting the charge current is only one layer of protection; cooling the cabinet and moving charging to cooler hours are further options not simulated in this PoC.",
+        "window": "Shown up to {{end}} (min:s) of the simulated session, seed {{seed}}."
+      }
+    }
+  },
+  "hub": {
+    "pipeline": {
+      "title": "The path of one message",
+      "steps": {
+        "sources": {
+          "title": "3 raw data sources",
+          "desc": "Each maker sends telemetry in its own format: field names, units, the sign of the current, the style of the timestamp and the reporting interval all differ."
+        },
+        "adapter": {
+          "title": "Normalising adapter",
+          "desc": "Recognises the maker from the shape of the message, converts units and sign, rebuilds each cell. A broken message is refused with a reason and never stops the stream."
+        },
+        "schema": {
+          "title": "One common schema (Telemetry)",
+          "desc": "Everything behind the adapter sees a single shape: pack id, time, every cell voltage, current, temperature, SOC, position."
+        },
+        "ai": {
+          "title": "One AI Engine",
+          "desc": "The same four modules and one Risk Score scale for every maker, so the alerts of different makers can be compared."
+        }
+      }
+    },
+    "scenarioNote": "One pack from each of the three makers runs the Overload in the heat scenario (seed 202, 10 simulated minutes); each reports in its own maker's format.",
+    "feeds": {
+      "title": "Three raw sources become one schema",
+      "intro": "Above: the message exactly as the maker's server sent it. Below: the result after the adapter. The latest message follows the simulation clock.",
+      "cadence": "Reports every {{seconds}} s",
+      "size": "about {{bytes}} bytes per message",
+      "shape": {
+        "A": "Flat JSON, snake_case field names, each cell voltage in mV, discharge current positive.",
+        "B": "Nested JSON, camelCase field names, ISO-8601 time, charge current positive (the opposite of the standard convention).",
+        "C": "A compact positional array tagged C1; sends only the pack voltage and each cell's offset, temperature at 0.5°C resolution."
+      },
+      "raw": "Raw message from the maker's server",
+      "last": "message at {{time}}",
+      "none": "No message has arrived yet (press Play).",
+      "rawAria": "Raw message of {{brand}}",
+      "adapterArrow": "Adapter",
+      "canonical": "After the adapter: normalised Telemetry",
+      "canonicalAria": "Normalised Telemetry of {{brand}}"
+    },
+    "mapping": {
+      "title": "Field map: who sends what, and how it is converted",
+      "intro": "Each row is one field of the standard schema. In each maker's cell: where it sits in the message (green), the maker's unit or encoding, and the conversion. Adding a maker means writing one more adapter; the AI does not change.",
+      "canonical": "Standard field",
+      "fields": {
+        "batteryId": "Pack id",
+        "ts": "Time of reading",
+        "cellVoltages": "Voltage of each cell",
+        "current": "Current (discharge positive)",
+        "coreTemp": "Core temperature",
+        "ambientTemp": "Ambient temperature",
+        "soc": "State of Charge (SOC)",
+        "position": "GPS position",
+        "cycleCount": "Cycle count"
+      }
+    },
+    "unified": {
+      "title": "One unified screen",
+      "intro": "The same table, the same units, for all three makers. Pack voltage is the sum of the cell voltages; cell spread is the highest cell minus the lowest.",
+      "rows": {
+        "batteryId": "Pack id",
+        "interval": "Reporting interval",
+        "soc": "State of Charge (SOC)",
+        "coreTemp": "Core temperature",
+        "current": "Current (discharge positive)",
+        "packV": "Pack voltage",
+        "spread": "Cell spread",
+        "score": "Risk Score",
+        "signal": "Main signal",
+        "alert": "Alert at"
+      },
+      "seconds": "{{seconds}} s",
+      "chartTitle": "Risk Score of the three makers on one scale",
+      "chartIntro": "The three makers send data at different rates (5, 10 and 15 s) but go through the same AI, so their scores share one scale. Each maker has its own line style and marker.",
+      "axisTime": "Time (min)",
+      "axisScore": "Risk Score (0 to 100)",
+      "warnLine": "Warning level ({{score}})"
+    },
+    "fidelity": {
+      "title": "What is lost in conversion? Difference from the sensor reading",
+      "intro": "Each format rounds the data in its own way. The table compares the adapter output with the simulator's sensor reading (mean and maximum over the whole session). These are validation figures; the AI never sees the sensor reading.",
+      "rows": {
+        "cellMv": "Cell voltage",
+        "coreTempC": "Core temperature",
+        "currentA": "Current",
+        "socPct": "SOC"
+      },
+      "meanMax": "mean {{mean}}, max {{max}} {{unit}}",
+      "note": "Maker C sends coarser data (0.5°C, whole-percent SOC, cells rebuilt from the pack voltage and offsets), so its error is larger; in this scenario the AI still alerts on maker C within a similar time to the other two. The AI uses each message's timestamp and does not assume an even time step."
+    },
+    "try": {
+      "title": "Try your own message",
+      "intro": "Pick a sample or edit the JSON on the left. The adapter recognises the maker from the shape of the message and normalises it, or refuses it with a reason and without crashing.",
+      "sample": "Sample",
+      "samples": {
+        "implausible": "Broken: absurd value (900°C)",
+        "nonNumeric": "Broken: text where a number belongs",
+        "unknown": "Broken: unknown format",
+        "brokenJson": "Broken: JSON cut off half-way"
+      },
+      "input": "Message (JSON)",
+      "result": "Result",
+      "recognised": "Recognised: {{brand}}",
+      "errors": {
+        "invalid_json": {
+          "title": "The JSON cannot be read",
+          "body": "The text is not valid JSON, for example cut off when a connection dropped. This message is skipped and the others are still processed."
+        },
+        "unknown_format": {
+          "title": "Unknown format",
+          "body": "The shape of the message matches no known maker. An adapter would have to be written for this maker."
+        },
+        "malformed": {
+          "title": "A field is missing or the wrong type",
+          "body": "The maker was recognised, but a field is missing or is not a number."
+        },
+        "out_of_range": {
+          "title": "A value outside physical limits",
+          "body": "A value (for example a temperature) is outside a plausible range, so it is treated as a sensor fault rather than as data."
+        }
+      }
+    },
+    "limits": {
+      "title": "Known limits",
+      "fictional": "The three makers here are fictional (names with a like suffix); the formats were written from assumed descriptions, not from any maker's real specification.",
+      "adapter": "With real makers, each one needs its own adapter and an API agreement. The effort for that has not been measured in the PoC.",
+      "moat": "The competitive value is in the engine shared across makers (the Cross-brand Digital Twin), not in reading one format."
+    }
+  },
+  "roi": {
+    "units": {
+      "billion": "{{value}} billion VND",
+      "packs": "packs",
+      "cyclesPerDay": "cycles/day",
+      "vndPerKwh": "VND/kWh",
+      "perThousand": "per 1,000 packs/year"
+    },
+    "fields": {
+      "packs": {
+        "label": "Number of packs",
+        "why": "The packs of the fleet or station network to monitor. The default is an illustrative size."
+      },
+      "packCostVnd": {
+        "label": "Price of one pack (VND)",
+        "why": "Replacement price of a pack; shares its value with the Overview screen. Replace with the real contract price."
+      },
+      "rideTempC": {
+        "label": "Average operating temperature (°C)",
+        "why": "Mean core temperature of the pack in use; sets how fast it ages (Arrhenius)."
+      },
+      "efcPerDay": {
+        "label": "Cycles per day",
+        "why": "One equivalent full cycle is one full discharge of the rated capacity. Shippers ride many hours a day so they often do more than one; the default is an illustrative assumption."
+      },
+      "saasFeeVndPerPackMonth": {
+        "label": "SaaS fee per pack per month (VND)",
+        "why": "The price is a business choice not yet made; the default is only for trying the calculator."
+      },
+      "chargeShare": {
+        "label": "Share of each cycle spent charging",
+        "why": "The part of each cycle that happens on charge; used for the benefit of charging cooler."
+      },
+      "packKwh": {
+        "label": "Capacity of one pack (kWh)",
+        "why": "The simulated 16S5P pack of 21700 cells is about 1.4 kWh."
+      },
+      "electricityVndPerKwh": {
+        "label": "Electricity price (VND/kWh)",
+        "why": "The charging station's tariff; an illustrative assumption to be replaced by a real bill."
+      },
+      "chargeEfficiency": {
+        "label": "Charging efficiency (grid to pack)",
+        "why": "The share of the energy drawn from the grid that really reaches the pack; the rest becomes heat in the charger and pack."
+      },
+      "incidentsPerThousandPacksYear": {
+        "label": "BMS cut-offs on the road (per 1,000 packs a year)",
+        "why": "The baseline frequency has no real data behind it; the default is only illustrative and should be replaced by the customer's operating data."
+      },
+      "packDamageFraction": {
+        "label": "Share of pack value lost when overheated",
+        "why": "Value lost to faster ageing or write-off when a pack is pushed toward 65°C. Shared with the Overview screen."
+      },
+      "strandedCostVnd": {
+        "label": "Cost of one vehicle stopped on the road (VND)",
+        "why": "Covers late orders, a recovery trip and lost shift time. Shared with the Overview screen."
+      },
+      "onboardingVndPerPack": {
+        "label": "One-off onboarding cost per pack (VND)",
+        "why": "Work to integrate the API and set up, paid once. An illustrative assumption."
+      }
+    },
+    "inputs": {
+      "title": "Inputs",
+      "reset": "Reset",
+      "intro": "The first five fields are the main inputs. Every value can be edited and the results on the right update at once. The defaults are illustrative assumptions only.",
+      "advanced": "Detailed assumptions"
+    },
+    "measured": {
+      "title": "Measured in the simulation",
+      "intro": "The Careful case uses only two figures measured in the PoC simulation. They run in a Web Worker and can take a few seconds.",
+      "pending": "Measuring in a Web Worker…",
+      "cooling": {
+        "title": "Cooler charging",
+        "body": "A fast-charging cabinet in the sun: the mean core temperature while charging is {{withCut}}°C when Voltify cuts the charge current, against {{without}}°C without it, a drop of {{drop}}°C."
+      },
+      "prevention": {
+        "title": "Incidents prevented",
+        "body": "In a simulated fleet of {{packs}} packs run for {{minutes}} minutes, the traditional BMS cut off {{trips}} packs in the control fleet; Voltify prevented {{prevented}} (a rate of {{rate}}%).",
+        "none": "In a simulated fleet of {{packs}} packs run for {{minutes}} minutes, the traditional BMS had no pack to cut off, so there is no rate yet."
+      },
+      "caveat": "The sample is small (a handful of incidents) and the packs in trouble are built into the simulated fleet, so this is a measurement on the simulation, not a rate to expect in the field. It can be edited in the table on the right."
+    },
+    "cases": {
+      "careful": {
+        "title": "Careful",
+        "desc": "Counts only what the PoC measured"
+      },
+      "target": {
+        "title": "Target",
+        "desc": "The targets of the brief, to be confirmed in a pilot"
+      }
+    },
+    "levers": {
+      "title": "Two cases: careful and target",
+      "intro": "Only three quantities differ between the two cases. Each cell says where its value comes from: measured in the simulation, a target of the brief that a pilot must confirm, or typed in by you.",
+      "rows": {
+        "lifeExtensionPct": "Longer pack life",
+        "electricitySavingPct": "Lower station electricity cost",
+        "preventionPct": "Share of incidents prevented"
+      },
+      "why": {
+        "lifeExtensionPct": "How much longer a pack lasts than without Voltify.",
+        "electricitySavingPct": "The part of the charging electricity bill that is saved.",
+        "preventionPct": "The part of the BMS cut-offs on the road that Voltify prevents."
+      },
+      "sources": {
+        "measured": "Measured in simulation",
+        "target": "Target, needs a pilot",
+        "unmeasured": "Not measured, counted as 0",
+        "pending": "Measuring…",
+        "override": "Typed by you"
+      },
+      "resetOne": "Use the default value again",
+      "derived": "From a {{drop}}°C cooler charge, through the Arrhenius model"
+    },
+    "results": {
+      "title": "Results per year",
+      "intro": "The two cases side by side, calculated from the inputs on the left. Click the name of a figure to see its formula and the numbers substituted into it.",
+      "clickHint": "Every figure can be traced: click its name to see the formula, the inputs and the assumptions."
+    },
+    "outputs": {
+      "replacement": {
+        "label": "Pack replacement cost saved",
+        "hint": "Fewer packs to replace each year when packs last longer, times the price of a pack"
+      },
+      "life": {
+        "label": "Longer pack life",
+        "hint": "From the life predicted from temperature and cycles (to SOH 80%)"
+      },
+      "energy": {
+        "label": "Electricity saved",
+        "hint": "The yearly charging electricity bill times the saved share"
+      },
+      "incidents": {
+        "label": "Incidents prevented",
+        "hint": "BMS cut-offs on the road each year that Voltify prevents"
+      },
+      "net": {
+        "label": "Net benefit after the SaaS fee",
+        "hint": "Total savings minus the subscription fee"
+      },
+      "payback": {
+        "label": "Payback time",
+        "hint": "The one-off onboarding cost divided by the monthly net benefit"
+      }
+    },
+    "values": {
+      "perYear": "per year",
+      "lifeFromTo": "from {{from}} to {{to}} days",
+      "incidents": "{{count}} incidents/year",
+      "incidentsWorth": "worth {{value}} a year",
+      "perFee": "benefit is {{ratio}} times the SaaS fee",
+      "noPayback": "no payback",
+      "months": "{{months}} months",
+      "onboarding": "onboarding cost {{value}}"
+    },
+    "trace": {
+      "title": "How it is calculated: {{name}}",
+      "formulas": {
+        "replacement": "Packs replaced per year = packs × 365 / life (days). Saving = (packs replaced before minus after) × pack price, where life with Voltify = life before × (1 + extension).",
+        "life": "Life (days) = (1 minus the end-of-life SOH of 0.8) / fade per cycle / cycles per day. Fade per cycle follows Arrhenius (Ea 20 kJ/mol) at the operating temperature. Life with Voltify = life × (1 + extension).",
+        "energy": "Energy per year (kWh) = packs × cycles per day × 365 × kWh per pack / charging efficiency. Bill = kWh × electricity price. Saving = bill × saved share.",
+        "incidents": "Incidents per year = packs × rate / 1,000. Prevented = incidents × prevention rate. Value = prevented × (pack price × share of value lost when overheated + cost of one vehicle stopped on the road), the same formula as the KPI on the Overview screen.",
+        "net": "Net benefit = pack replacement saving + electricity saving + value of incidents prevented − SaaS fee (packs × fee × 12). The break-even extension is the one at which the net benefit is zero, other quantities held.",
+        "payback": "Payback (months) = onboarding cost (packs × cost per pack) / monthly net benefit. There is no payback if the net benefit is not positive."
+      },
+      "steps": {
+        "fadePerCycle": "Capacity fade per cycle",
+        "cyclesToEol": "Cycles to SOH 80%",
+        "daysToEol": "Life (days)",
+        "replacementsBefore": "Packs replaced per year, without Voltify",
+        "lifeExtension": "Life extension",
+        "daysWith": "Life with Voltify (days)",
+        "replacementsAfter": "Packs replaced per year, with Voltify",
+        "packCost": "Price of one pack",
+        "replacementSaving": "Replacement saving per year",
+        "temperature": "Operating temperature",
+        "cyclesPerDay": "Cycles per day",
+        "daysAdded": "Days of life added",
+        "energyKwh": "Charging energy per year (kWh)",
+        "price": "Electricity price per kWh",
+        "energyBill": "Electricity bill per year",
+        "energySavingPct": "Share of electricity saved",
+        "energySaving": "Electricity saving per year",
+        "incidentsBefore": "Incidents per year, without Voltify",
+        "preventionRate": "Prevention rate",
+        "incidentsPrevented": "Incidents prevented per year",
+        "costPerIncident": "Cost of one incident (pack value lost plus stranded vehicle)",
+        "incidentSaving": "Value of incidents prevented per year",
+        "totalBenefit": "Total savings per year",
+        "saasFee": "SaaS fee per year",
+        "netBenefit": "Net benefit per year",
+        "benefitPerFee": "Benefit per VND of SaaS fee",
+        "breakEven": "Break-even life extension",
+        "onboarding": "One-off onboarding cost",
+        "netPerMonth": "Net benefit per month",
+        "paybackMonths": "Payback (months)"
+      }
+    },
+    "chart": {
+      "title": "How much longer must packs last to break even?",
+      "intro": "Net benefit per year against the life extension, other quantities held as in the Careful case. The solid and dotted lines mark your two cases.",
+      "axisX": "Longer pack life (%)",
+      "axisY": "Net benefit per year (billion VND)",
+      "series": "Net benefit",
+      "breakEven": "Break-even {{pct}}%",
+      "verdict": "With the current assumptions, Voltify only has to make packs last about {{pct}}% longer for the benefits to cover the SaaS fee (other quantities as in the Careful case).",
+      "noNeed": "The other benefits of the Careful case already cover the SaaS fee, so no life extension is needed.",
+      "impossible": "At this SaaS fee no life extension is enough: the fee is larger than everything spent on replacing packs today."
+    },
+    "limits": {
+      "title": "Known limits",
+      "illustrative": "The pack price, SaaS fee, electricity price, incident frequency and onboarding cost are illustrative assumptions so the model can run; replace them with the customer's own figures.",
+      "target": "The targets of about 35% longer pack life and about 20% lower electricity cost are targets to be confirmed in a pilot, not measured results.",
+      "measured": "The Careful case uses only figures measured in the simulation: the cooler charge in a hot cabinet and the prevention rate on a small simulated fleet. An electricity saving has not been measured, so it is counted as 0.",
+      "noPromise": "This is a tool for trying numbers, not a promise of revenue or savings."
+    }
+  },
+  "references": {
+    "title": "References",
+    "intro": "The three sources of the brief, with what each is used for and what is deliberately not taken from it.",
+    "newTab": "(opens in a new tab)",
+    "use": "Used for",
+    "caution": "Not taken from it",
+    "items": {
+      "mdpi": {
+        "title": "MDPI: Digital Twin battery models",
+        "source": "mdpi.com, scientific article",
+        "use": "Scientific basis for estimating internal resistance and lifetime (SOH) with a Digital Twin; used only to support the SOH module.",
+        "caution": "The accuracy figure quoted in the paper is not used as Voltify's fire-prediction accuracy: that is a different problem."
+      },
+      "ifactory": {
+        "title": "iFactory AI: thermal runaway risk management",
+        "source": "ifactoryapp.com, a vendor's material",
+        "use": "Background: using AI to warn early of thermal runaway.",
+        "caution": "It speaks of warning hours ahead in battery production. Voltify does not borrow that figure; it uses the lead time measured in the simulation (Evidence screen)."
+      },
+      "tuoitre": {
+        "title": "Tuổi Trẻ News: the battery-swap station investment race in Vietnam",
+        "source": "news.tuoitre.vn, press",
+        "use": "Market context: investment in battery-swap stations in Vietnam is heating up.",
+        "caution": "This is a context source, not market-size data; TAM, SAM and SOM stay placeholders until figures with a verified source exist."
+      }
+    }
+  },
+  "evidence": {
+    "banner": "These are results on simulated data: a large number of virtual packs run right in the browser through the real pipeline (simulator, maker format, adapter, AI). Seeds 301 to 306 were never used to tune the AI's thresholds (they were tuned on 201 to 203). No figure here is typed in by hand. The one exception, labelled as real data on its own, is the SOH test on NASA's public battery data.",
+    "running": "Running {{done}}/{{total}} simulation groups in a Web Worker…",
+    "rules": {
+      "title": "How it is counted: what is an incident, what is normal",
+      "intro": "An event is something the simulator knows happened: the pack had an internal short, or the traditional BMS had to cut it off because its core reached 65°C. The AI counts as having detected it when its Risk Score ever reached the Warning level (50 points). Two kinds of pack are not clear-cut and are handled by the two choices below, both of which can be changed.",
+      "nearMiss": "Packs that nearly reached the limit",
+      "nearMissOptions": {
+        "exclude": "Leave out of the statistics (default)",
+        "event": "Count as events",
+        "normal": "Count as normal"
+      },
+      "nearMissHint": "The core reached {{temp}}°C or more but the BMS did not cut off and there was no short.",
+      "maintenance": "The fleet with a weak cell",
+      "maintenanceOptions": {
+        "normal": "Count as normal: an alert is a false alarm (default)",
+        "exclude": "Leave out of the statistics"
+      },
+      "maintenanceHint": "A weak cell is a maintenance matter, not a fire risk, but the voltage module has trouble telling it from a leaking cell."
+    },
+    "headline": {
+      "recall": "Detection rate (Recall)",
+      "recallHint": "Of the real events, how many the AI alerted on.",
+      "precision": "Alert accuracy (Precision)",
+      "precisionHint": "Of the packs the AI alerted on, how many really had an event. It depends on the share of events in the sample.",
+      "far": "False alarm rate",
+      "farHint": "Of the normal packs, how many the AI alerted on.",
+      "auc": "Area under the ROC",
+      "aucHint": "The probability that the AI scores an event higher than a normal pack. 1 means perfect separation, 0.5 means chance.",
+      "lead": "Early warning (Lead time), mean",
+      "leadRange": "from {{min}} to {{max}} minutes, over {{n}} events",
+      "leadHint": "From the AI's alert to the traditional BMS cutting off at 65°C. The 30 to 45 minute target has to be confirmed in a pilot.",
+      "minutes": "{{value}} min",
+      "interval": "95% confidence interval: {{lo}} to {{hi}}",
+      "sample": "Counted: {{packs}} packs, of which {{events}} events and {{normals}} normal packs ({{prevalence}}% events). Every rate is true only for this sample and this way of counting."
+    },
+    "confusion": {
+      "title": "Confusion matrix",
+      "intro": "Rows are what the simulator knows, columns are what the AI said.",
+      "alerted": "AI alerted",
+      "quiet": "AI silent",
+      "event": "Event",
+      "normal": "Normal",
+      "tp": "correct detection (TP)",
+      "fn": "missed (FN)",
+      "fp": "false alarm (FP)",
+      "tn": "correctly silent (TN)",
+      "excluded": "{{count}} packs are left out of the matrix by the chosen way of counting."
+    },
+    "roc": {
+      "title": "ROC curve",
+      "intro": "Detection rate and false alarm rate as the Risk Score threshold moves. The three points are the thresholds 25, 50 (the Warning level) and 75.",
+      "curve": "Voltify AI",
+      "chance": "Chance",
+      "thresholds": "Score threshold",
+      "pointLabel": "from {{threshold}} points",
+      "tooltip": "Threshold {{threshold}}: detects {{tpr}}, false alarms {{fpr}}",
+      "axisX": "False alarm rate",
+      "axisY": "Detection rate"
+    },
+    "lead": {
+      "title": "Lead time distribution",
+      "intro": "How many events were alerted this many minutes before the BMS cut off. The yellow band is the 30 to 45 minute target.",
+      "series": "Events",
+      "target": "Target 30 to 45 minutes",
+      "tooltip": "{{from}} to {{to}} min: {{count}} events",
+      "axisX": "Lead time (min)",
+      "axisY": "Events",
+      "late": "{{count}} events were alerted after the BMS had already cut off."
+    },
+    "groups": {
+      "title": "Results by kind of run",
+      "intro": "Each row is one kind of scenario. The events column is the number of packs the simulator knows had an event; the alerted column is the number of packs the AI alerted on (every pack, event or not).",
+      "cols": {
+        "group": "Kind of run",
+        "packs": "Packs",
+        "events": "Events",
+        "near": "Near misses",
+        "alerted": "AI alerted",
+        "delay": "Detected after the event began (median)"
+      },
+      "ofEvents": "{{alerted}}/{{events}} events",
+      "names": {
+        "baseline": "Ordinary day",
+        "heatwave43": "Heat wave, 43°C",
+        "heavyClimb": "Heavy load and climbing",
+        "agedHigh": "Heavily aged pack",
+        "cellImbalance": "Imbalanced cell (maintenance)",
+        "severeHeatLoad": "Overload in the heat (hard case)",
+        "short_severe": "Internal short: severe",
+        "short_moderate": "Internal short: moderate",
+        "short_mild": "Internal short: mild",
+        "short_veryMild": "Internal short: very mild",
+        "shortNeighbour": "Healthy packs next to a shorted one"
+      },
+      "descs": {
+        "baseline": "Normal operation, no fault.",
+        "heatwave43": "Air up to 43°C, ordinary load.",
+        "heavyClimb": "Heavy load, steady climbing, no fault inside the pack.",
+        "agedHigh": "A heavily aged pack with high resistance.",
+        "cellImbalance": "Every pack has one cell weaker than the others.",
+        "severeHeatLoad": "Aged pack, 100 kg load, climbs, harsh sun, pack sealed in the compartment. Many packs reach 65°C.",
+        "short_severe": "The short resistance falls fast and deep.",
+        "short_moderate": "The short resistance falls more slowly and less deep.",
+        "short_mild": "The short resistance falls slowly and shallowly.",
+        "short_veryMild": "At the edge of visibility: it gives off very little heat.",
+        "shortNeighbour": "Normal packs running in the same fleet as the shorted one."
+      }
+    },
+    "reasons": {
+      "baseline": "no case of this kind in the sample.",
+      "heatwave43": "no case of this kind in the sample.",
+      "agedHigh": "no case of this kind in the sample.",
+      "heavyClimb": "a very heavy load pushes the current past the safe curve, so the AI flags overload although the pack has no fault.",
+      "cellImbalance": "a weak cell skews the voltages like a leaking cell and the voltage module cannot fully tell them apart. A false alarm for fire but right about the need for maintenance.",
+      "severeHeatLoad": "the pack got hot but not to 60°C. The AI alerts because the temperature is rising and the load is too heavy; under the strict count it is still a false alarm.",
+      "short_severe": "this case was not alerted.",
+      "short_moderate": "this case was not alerted.",
+      "short_mild": "this case was not alerted.",
+      "short_veryMild": "a very mild short gives off too little heat to reach the Warning level within the simulated window.",
+      "shortNeighbour": "a healthy pack alerted by mistake."
+    },
+    "cases": {
+      "cols": {
+        "group": "Kind of run",
+        "pack": "Pack",
+        "seed": "Seed",
+        "score": "Highest score",
+        "temp": "Peak temperature"
+      },
+      "open": "View on the Digital Twin",
+      "all": "Show all {{count}} cases",
+      "fewer": "Show fewer",
+      "missTitle": "Cases the AI missed",
+      "missIntro": "Real events the AI never took to the Warning level. Click a case to replay that very pack.",
+      "missEmpty": "No missed cases in this sample. That does not prove the AI never misses.",
+      "falseTitle": "Cases the AI got wrong",
+      "falseIntro": "Normal packs the AI alerted on. Grouped by cause so the commonest kind of error stands out.",
+      "falseEmpty": "No false alarms in this sample."
+    },
+    "soh": {
+      "title": "SOH module: estimate against the simulator's truth",
+      "intro": "The AI estimates State of Health (SOH) from internal resistance. Each dot is one pack of the fault-free fleets after 75 minutes; a dot on the dashed line is a perfect estimate.",
+      "cols": {
+        "n": "Packs",
+        "mae": "Mean error size (% points)",
+        "bias": "Mean bias (% points)",
+        "classes": "Put in the right good, fair, weak class"
+      },
+      "note": "Makers that report less often (B every 10 s, C every 15 s) lose the current history between two messages, so their estimate is worse; this is a limit of the data, not of tuning.",
+      "ideal": "Perfect estimate",
+      "tooltip": "True {{truth}}, estimated {{est}}",
+      "axisX": "True SOH in the simulation (%)",
+      "axisY": "SOH estimated by the AI (%)"
+    },
+    "real": {
+      "title": "Real data: NASA PCoE, ageing Li-ion cells",
+      "intro": "Four 18650 cells (B0005, B0006, B0007, B0018) were charged and discharged repeatedly at room temperature until they lost 30% of their rated 2 Ah capacity, with impedance (Re + Rct) measured along the way. The true SOH is the measured capacity. The question: does the law of the SOH module (resistance / resistance when new = 1 + γ × (1 − SOH)) hold on these real cells?",
+      "cell": "Cell",
+      "chartAria": "SOH measured from capacity and SOH estimated from resistance, cell {{cell}}",
+      "series": {
+        "measured": "SOH from capacity (real)",
+        "module": "From resistance, γ = {{gamma}} (module)",
+        "others": "From resistance, γ = {{gamma}} (other 3 cells)"
+      },
+      "eol": "End of life of the experiment (1.4 Ah)",
+      "tooltip": "Discharge cycle {{cycle}}: SOH {{soh}}",
+      "axisX": "Discharge cycle",
+      "axisY": "SOH (% of the starting capacity)",
+      "cols": {
+        "cell": "Cell",
+        "fade": "Capacity lost",
+        "ratio": "Resistance, end / start",
+        "gamma": "γ that fits this cell",
+        "module": "SOH error with the module's γ (% points)",
+        "others": "SOH error with γ from the other 3 cells (% points)",
+        "baseline": "Error if the cell is always taken as new (% points)"
+      },
+      "counts": "{{d}} discharges, {{i}} impedance measurements",
+      "colsNote": "The error is the mean size of the difference between the estimated and the true SOH over the cell's impedance measurements. The module uses γ = {{gamma}}, an assumption of the simulation.",
+      "findingTitle": "Result: the simulation's assumption does not hold on these real cells",
+      "finding": "The resistance of the real cells rises far less than assumed: the γ that fits each cell is only {{gMin}} to {{gMax}}, whereas the module uses {{gamma}}. So with the module's γ the estimated SOH is off by {{mMin}} to {{mMax}} % points, hardly better than taking the cell as new. Calibrating γ on the other 3 cells is not enough either: it is off by {{oMin}} to {{oMax}} % points.",
+      "consequence": "Consequence: the law from resistance to SOH has to be calibrated for each type of pack with pilot data, and cross-checked against a capacity-based estimate. The small errors in the simulated table above only mean something inside the simulation.",
+      "scope": "Scope: this test checks the law from resistance to SOH, not the online RLS estimator (which needs pack telemetry with current steps). The impedance here is measured by EIS whereas Voltify estimates it from telemetry; and a small 18650 cell at room temperature differs from an electric-moped pack.",
+      "source": "Data source:",
+      "link": "NASA data repository"
+    },
+    "limits": {
+      "title": "Known limits",
+      "items": {
+        "simulated": "Except for the SOH test on NASA's real data, every result here is on simulated data. The AI was tuned on the same kind of physics it is evaluated on, so the gap between simulation and reality (the sim-to-real gap) is the biggest unknown; only a pilot with real telemetry can answer it.",
+        "event": "An event here is an internal short or a BMS cut-off at 65°C, not a real fire; the simulation does not reproduce fires. Packs that reached {{temp}}°C without the BMS cutting off are handled separately and can be counted differently.",
+        "lead": "The measured lead time is below the 30 to 45 minute target. The live forecast of the time left to 65°C is usually more optimistic than reality; it is a forecast, not a promise.",
+        "short": "Cutting power by 15% only slows the rise when the heat comes from the load; for an internal short, Voltify's value is early warning and isolation (a swap), not making the temperature stop rising.",
+        "weakCell": "A weak cell and a leaking cell give similar voltage signals, so part of the weak-cell fleet is alerted; that is a false alarm for fire but useful for maintenance.",
+        "slow": "A very mild short (final resistance {{ohm}} ohm, about 9 W) gives off too little heat: many such cases are missed within the 100-minute simulated window.",
+        "soh": "SOH estimation is worse for makers that report sparsely. On NASA's real cells the simulation's law from resistance to SOH did not hold (see the real-data part above), so the module's SOH can only be trusted once it has been calibrated on real data.",
+        "prevalence": "Precision depends on the share of events in the sample; a real fleet may have a very different share, so this figure must not be used to predict precision in the field."
+      }
+    },
+    "roadmap": {
+      "title": "Roadmap",
+      "one": "Stage 1 (pilot): monitoring and alerts only on real telemetry, used to calibrate the thresholds and to measure the real lead time, precision and recall.",
+      "two": "Stage 2: control back to the vehicle and the charging cabinet (power cut, charge-current cut) once stage 1 shows the alerts are reliable enough.",
+      "three": "Widen the SOH validation to other public datasets (for example CALCE), other cells and packs, then to pilot data; calibrate the law from resistance to SOH for each type of pack."
+    }
+  },
+  "market": {
+    "uvp": {
+      "label": "Unique value proposition (UVP)",
+      "statement": "Voltify warns early of fire risk and extends battery life for commercial electric mopeds, with cloud software alone, for every battery maker on one screen.",
+      "points": {
+        "proactive": {
+          "title": "Proactive prediction",
+          "body": "A warning tens of minutes ahead (the figure measured on the Evidence screen) instead of waiting for the BMS to cut off passively at 65°C."
+        },
+        "saas": {
+          "title": "Pure SaaS",
+          "body": "Uses the BMS and the GPS/4G module already in the pack, so no new hardware."
+        },
+        "agnostic": {
+          "title": "Maker-independent",
+          "body": "Normalises many formats into one Digital Twin and one Risk Score scale, for delivery mopeds and battery-swap stations."
+        }
+      }
+    },
+    "problem": {
+      "title": "The problem",
+      "intro": "Urban heat of 40 to 43°C (road surface up to about 55°C) together with how hard shippers work the pack (10 to 12 hours a day, heavy continuous current) pushes lithium-ion packs to their limits.",
+      "items": {
+        "fire": "Sudden fire: a traditional BMS only cuts off passively once a limit has been reached.",
+        "aging": "Hidden ageing about 30 to 40% faster than normal (per the brief); a company cannot watch each pack and has to replace packs early.",
+        "downtime": "Operational breakdown: a vehicle that dies on the road delays orders."
+      }
+    },
+    "solution": {
+      "title": "The solution",
+      "intro": "SaaS running entirely in the cloud. Telemetry (about every 5 seconds) goes from the pack through the vehicle maker's server and over an API to Voltify.",
+      "items": {
+        "cloud": "Uses the BMS and the GPS/4G module already in the pack: no extra hardware.",
+        "twin": "Builds a Digital Twin of each pack from four measurements: every cell voltage, charge and discharge current, internal temperature and internal resistance.",
+        "cross": "Normalises many makers into one schema and one operations screen (Cross-brand Hub).",
+        "assets": "Optimises the battery asset: good packs on long routes, weak packs on short trips or in for service."
+      }
+    },
+    "targets": {
+      "title": "Value targets and what has been measured",
+      "intro": "The targets of the brief set beside what the PoC has measured. A target only becomes a result when a pilot confirms it.",
+      "cols": {
+        "what": "Measure",
+        "target": "Target of the brief",
+        "measured": "Measured in the PoC",
+        "status": "Status"
+      },
+      "rows": {
+        "lead": "Early warning (Lead time)",
+        "life": "Longer pack life",
+        "energy": "Lower station electricity cost"
+      },
+      "leadTarget": "30 to 45 minutes",
+      "lifeTarget": "about {{pct}}%",
+      "energyTarget": "about {{pct}}%",
+      "leadMeasured": "hard case of the BMS-vs-Voltify screen, makers A, B, C: {{a}}, {{b}} and {{c}} minutes",
+      "lifeMeasured": "about {{pct}}% (projected from cooler charging in a hot cabinet)",
+      "none": "not measured yet",
+      "loading": "measuring…",
+      "status": {
+        "met": "Met in the simulation, a pilot must confirm",
+        "below": "Measured, below the target",
+        "pilot": "Needs confirming in a pilot"
+      },
+      "note": "The lead time comes from the hardest case of the BMS-vs-Voltify screen; the mean over many cases is on the Evidence screen. The life extension is a projection of the Arrhenius model with the assumptions on the ROI screen."
+    },
+    "sizing": {
+      "title": "Market size (TAM, SAM, SOM)",
+      "intro": "There are no market-size figures with a verified source yet, so only the definitions are given here; the figures stay placeholders until a source exists.",
+      "placeholder": "[fill in figure + source]",
+      "tam": {
+        "label": "TAM",
+        "name": "Global",
+        "def": "Smart battery management and remote diagnostics software for electric vehicles worldwide."
+      },
+      "sam": {
+        "label": "SAM",
+        "name": "Southeast Asia",
+        "def": "Electric two-wheelers and battery-swap stations in the large cities of Southeast Asia (Vietnam, Indonesia, Thailand, the Philippines)."
+      },
+      "som": {
+        "label": "SOM",
+        "name": "First 1 to 3 years, in Vietnam",
+        "def": "The share of the market that can be won in Vietnam in the first 1 to 3 years.",
+        "target": "Target: monitor {{packs}} smart packs after 2 years",
+        "value": "This is a target number of packs, not revenue or market size."
+      }
+    },
+    "arr": {
+      "title": "Annual revenue, an illustrative calculation",
+      "formula": "{{packs}} packs × {{fee}} VND per pack per month × 12 months = {{total}} a year.",
+      "caveat": "Only an illustration: the SaaS fee is the default of the ROI screen (not decided) and the 50,000-pack target still has to be proven. This is not a revenue forecast.",
+      "link": "Change the fee on the ROI screen"
+    },
+    "competitors": {
+      "title": "Competitor comparison",
+      "intro": "The three kinds of competitor in the brief. Only what the brief states is filled in; cells with no source are deliberately left as placeholders.",
+      "criterion": "Criterion",
+      "placeholder": "[to be verified + source]",
+      "columns": {
+        "voltify": {
+          "name": "Voltify",
+          "who": "Maker-independent SaaS"
+        },
+        "oem": {
+          "name": "Large vehicle makers",
+          "who": "Tesla, VinFast"
+        },
+        "deeptech": {
+          "name": "Foreign deep-tech startups",
+          "who": "Electra Vehicles, Twaice"
+        },
+        "inhouse": {
+          "name": "In-house engineering teams",
+          "who": "Local electric-moped makers"
+        }
+      },
+      "rows": {
+        "vehicle": "Target vehicle type",
+        "compat": "Hardware compatibility",
+        "charging": "Energy-supply model",
+        "ai": "Level of AI",
+        "model": "Product model",
+        "market": "Key market"
+      },
+      "cells": {
+        "voltify": {
+          "vehicle": "Delivery electric mopeds and battery-swap stations",
+          "compat": "Maker-independent (agnostic)",
+          "charging": "Optimised for fast battery swapping",
+          "ai": "Deep machine learning to predict thermal shock",
+          "model": "SaaS subscription per pack",
+          "market": "Vietnam and Southeast Asia"
+        },
+        "oem": {
+          "vehicle": "The maker's own vehicles",
+          "compat": "Closed ecosystem, manages only its own vehicles",
+          "charging": "[to be verified + source]",
+          "ai": "[to be verified + source]",
+          "model": "[to be verified + source]",
+          "market": "[to be verified + source]"
+        },
+        "deeptech": {
+          "vehicle": "Electric cars, trucks, energy storage systems",
+          "compat": "[to be verified + source]",
+          "charging": "Leaves two-wheelers and battery-swap stations in Southeast Asia unserved",
+          "ai": "Deep technology (as described in the brief)",
+          "model": "[to be verified + source]",
+          "market": "Europe and the US"
+        },
+        "inhouse": {
+          "vehicle": "The maker's own electric mopeds",
+          "compat": "[to be verified + source]",
+          "charging": "[to be verified + source]",
+          "ai": "Strong in hardware but weak in data science; an AI team is costly to keep",
+          "model": "[to be verified + source]",
+          "market": "Vietnam"
+        }
+      },
+      "note": "Competitor names are public information; cells still marked as placeholders have no verified source yet and are not conclusions."
+    },
+    "advantage": {
+      "title": "Unfair advantage",
+      "items": {
+        "engine": {
+          "title": "Cross-brand Digital Twin engine",
+          "body": "One engine shared across makers and formats; adding a maker only takes one more adapter."
+        },
+        "data": {
+          "title": "An accumulating data moat",
+          "body": "The more packs run in the field, the more thermal-shock scenarios the model learns."
+        }
+      },
+      "caveat": "The data advantage is real only with a pilot and real data; this PoC proves only the architecture."
+    },
+    "revenue": {
+      "title": "Revenue model",
+      "intro": "A SaaS subscription per pack.",
+      "items": {
+        "subscription": "A subscription fee per pack per month; the fee is not decided (try levels on the ROI screen).",
+        "customers": "Customers: last-mile logistics companies, vehicle makers, battery-swap station networks.",
+        "noHardware": "No new hardware is sold: it uses the BMS and the GPS/4G module already there."
+      }
+    },
+    "roadmap": {
+      "title": "Roadmap",
+      "stage": "Stage {{n}}",
+      "note": "A roadmap by stage, without dates because it depends on the results of the pilot.",
+      "items": {
+        "poc": {
+          "title": "Simulated PoC",
+          "body": "This demo: a physics-based simulation, an explainable AI, validated on simulated data."
+        },
+        "pilot": {
+          "title": "Pilot: monitoring and alerts",
+          "body": "Runs on a customer's real telemetry, alerting only, no control yet; measures the real lead time, precision and recall."
+        },
+        "control": {
+          "title": "Control back to the vehicle",
+          "body": "Cuts discharge power and charge current through the BMS and the cabinet, after an agreement with the vehicle maker."
+        },
+        "scale": {
+          "title": "Multi-maker expansion",
+          "body": "The target of monitoring 50,000 packs after 2 years in Vietnam, then Southeast Asia."
+        }
+      }
+    },
+    "impact": {
+      "title": "Social and environmental meaning",
+      "items": {
+        "trust": {
+          "title": "Less worry about fire and ageing",
+          "body": "These are two barriers to switching to electric vehicles."
+        },
+        "fire": {
+          "title": "Preventing emissions from fires",
+          "body": "An early warning helps avoid fires and the emissions that come with them."
+        },
+        "waste": {
+          "title": "Less heavy-metal waste",
+          "body": "A longer pack life means fewer packs to dispose of."
+        },
+        "grid": {
+          "title": "Less strain on the grid",
+          "body": "Smart charging at off-peak hours."
+        }
+      },
+      "caveat": "This is the expected direction of impact, not measured in the PoC."
+    }
+  },
+  "sandbox": {
+    "controls": {
+      "title": "Build your own scenario",
+      "intro": "Drag the sliders or pick a ready-made scenario; the simulation reruns once you stop dragging. The traditional BMS is on the left and Voltify on the right, on the same seed, so they are identical until Voltify sends its first command.",
+      "reset": "Back to an ordinary day"
+    },
+    "presets": {
+      "label": "Ready-made scenarios",
+      "items": {
+        "ordinary": "Ordinary day",
+        "heatwave43": "Heat wave, 43°C",
+        "heavyClimb": "Heavy load + climbing",
+        "weakCell": "Imbalanced cell",
+        "internalShort": "Internal short",
+        "aged": "Heavily aged pack",
+        "worst": "Hard case (overload + harsh sun)"
+      }
+    },
+    "groups": {
+      "weather": "Weather and cooling",
+      "load": "Load and road",
+      "pack": "Pack",
+      "fault": "Inject a fault"
+    },
+    "fields": {
+      "ambientPeakC": "Highest temperature of the day",
+      "coolingScale": "How well the pack sheds heat",
+      "startWarmC": "Pack warmer than the air at the start",
+      "payloadKg": "Load on the bike (rider and cargo)",
+      "climbGradePct": "Steepness of the climbs",
+      "climbDutyPct": "Share of the ride spent climbing",
+      "speedScale": "Riding pace",
+      "sohPct": "Starting State of Health (SOH)",
+      "brand": "Battery brand",
+      "weakCell": "One cell weaker than the others",
+      "shortOn": "Inject an internal short into the pack",
+      "onsetMin": "The short starts at minute",
+      "severity": "Severity of the short",
+      "intervention": "What Voltify does",
+      "duration": "Simulated time",
+      "seed": "Random seed"
+    },
+    "hints": {
+      "ambientPeakC": "The highest air temperature of the day; the run starts around noon.",
+      "coolingScale": "1 is normal; 0.25 is a pack sealed in a sun-baked compartment.",
+      "startWarmC": "A pack just off a hot charging cabinet is usually a few degrees warmer than the air.",
+      "payloadKg": "A heavy load means more current and so more heat.",
+      "climbDutyPct": "The part of the ride spent on slopes.",
+      "sohPct": "The more aged the pack, the higher its resistance and the more heat it makes.",
+      "weakCell": "Cell capacity 18% lower and resistance 1.7 times higher.",
+      "shortOn": "Cutting power does not stop the heat of a short from rising; Voltify's value here is early warning and the pack swap.",
+      "seed": "The same seed and the same sliders give exactly the same result."
+    },
+    "units": {
+      "min": "min"
+    },
+    "severities": {
+      "severe": "Severe",
+      "moderate": "Moderate",
+      "mild": "Mild"
+    },
+    "durationOption": "{{minutes}} min",
+    "running": "Running the simulation in a Web Worker…",
+    "notes": {
+      "title": "Worth knowing in the Sandbox",
+      "same": "Both sides use the same seed and scenario; every difference is due to Voltify's commands (power cut, swap), not to chance.",
+      "short": "With an internal short the heat comes from the short itself, so cutting power only slows it; the swap is what removes the load. A mild short may go unseen in a short run (see the Evidence screen).",
+      "limits": "This is a simulation with assumed parameters, not a prediction for any one vehicle."
+    }
+  },
+  "story": {
+    "intro": {
+      "title": "A {{minutes}}-minute automatic demo",
+      "body": "It walks through four screens: the fleet overview, the traditional BMS vs Voltify, the intervention mechanism and the ROI, each with captions. Every number in the captions comes from the simulation itself. Press Esc or Exit to stop at any time.",
+      "start": "Start the demo",
+      "sandbox": "Or try it yourself in the Sandbox",
+      "repeatable": "The demo is repeatable: the fleet uses seed 2026 and the BMS-vs-Voltify case uses seed 202, so every run tells the same story. You can pause, jump to another step, or click around the screens yourself (the demo then pauses and waits for you).",
+      "stepsTitle": "Four steps",
+      "startHere": "Start from this step"
+    },
+    "steps": {
+      "screen": "Screen {{n}}",
+      "fleet": {
+        "name": "Fleet overview",
+        "what": "A map of 300 packs by risk level, with KPIs you can trace."
+      },
+      "bms": {
+        "name": "Traditional BMS vs Voltify",
+        "what": "One bad day, two outcomes: the BMS cuts off at 65°C, Voltify warns early."
+      },
+      "intervention": {
+        "name": "Intervention mechanism",
+        "what": "The shipper's phone, the command log and the pack swap."
+      },
+      "roi": {
+        "name": "ROI and Impact",
+        "what": "Net benefit, payback and the life extension needed to break even."
+      }
+    },
+    "beats": {
+      "fleet": {
+        "b1": "This is a simulated fleet of 300 packs in Ho Chi Minh City and Hanoi, one point per pack. Shape and colour show the risk level: Safe, Watch, Warning, Danger.",
+        "b2": "Voltify watches every pack continuously. The pack with the highest Risk Score has just been selected: its readings and status are on the right.",
+        "b3": "Every number here can be traced: click the Incidents prevented KPI to see the formula and the control fleet with no intervention."
+      },
+      "bms": {
+        "b1": "The same 43°C day, an aged pack, a heavy load, a climb. The two sides are identical; the only difference is that the right side has Voltify.",
+        "b2": "Voltify alerts at {{alert}} and cuts power by {{derate}}%. The traditional BMS does nothing yet because the core has not reached 65°C.",
+        "b3": "The BMS cuts off at {{trip}} when the core reaches 65°C: the vehicle dies on the road. Voltify warned {{lead}} minutes earlier and the peak was only {{peak}}°C, against {{bmsPeak}}°C with the traditional BMS."
+      },
+      "intervention": {
+        "b1": "When the Risk Score reaches the Warning level, the platform sends a {{derate}}% power cut down to the vehicle and tells the shipper.",
+        "b2": "The shipper's phone gets a notification: swap at station {{station}}, {{distance}} m away, a cool pack already held. The map is the straight line the simulation assumes.",
+        "b3": "The pack is swapped by {{swap}}; the hot pack stays at the station to cool. The command log shows simulated example formats. Stage 1 only alerts; commands down to the vehicle are stage 2."
+      },
+      "roi": {
+        "b1": "The ROI calculator: the number of packs, pack price, operating temperature, cycles per day and SaaS fee are all editable. The defaults ({{packs}} packs, a fee of {{fee}} VND per pack per month) are only illustrative assumptions.",
+        "b2": "The Careful case uses only what the simulation measured: a net benefit of about {{careful}} a year, paid back in {{payback}} months. Packs only need to last about {{breakEven}}% longer for the benefits to cover the SaaS fee.",
+        "b3": "The Target case (35% longer life, 20% less electricity) gives about {{target}} a year, but that is a target a pilot has to confirm, not a measured result."
+      }
+    },
+    "panel": {
+      "aria": "Demo guide",
+      "step": "Step {{current}}/{{total}}",
+      "steps": "Steps of the demo",
+      "progress": "Demo progress",
+      "time": "{{elapsed}} / {{total}}",
+      "prev": "Back",
+      "next": "Next",
+      "pause": "Pause",
+      "resume": "Resume",
+      "exit": "Exit",
+      "replay": "Replay from the start"
+    },
+    "end": {
+      "title": "End of the demo",
+      "body": "You have just seen the fleet, the traditional BMS vs Voltify case, the intervention mechanism and the ROI. The evidence and the limits are on the screens below.",
+      "limits": {
+        "simulated": "All data is simulated; there is no real battery data yet.",
+        "targets": "The targets of 30 to 45 minutes of lead time, 35% longer life and 20% less electricity need a pilot to confirm; the measured figures are lower or not yet available.",
+        "phases": "Stage 1 only monitors and alerts; control back to the vehicle is stage 2."
+      },
+      "evidence": "See the Evidence screen",
+      "sandbox": "Try the Sandbox",
+      "market": "Market and Business"
     }
   }
 }

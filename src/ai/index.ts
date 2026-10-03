@@ -8,5 +8,6 @@ export * from './riskScore';
 export * from './severity';
 export * from './thermalTrend';
 export * from './types';
+export * from './vitals';
 export * from './voltageAnomaly';
 export { clamp, interpolate, ramp } from './mathutil';

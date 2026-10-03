@@ -4,6 +4,7 @@ import { Outlet, useLocation } from 'react-router-dom';
 import { findRoute } from '@/app/routes';
 import { Footer } from './Footer';
 import { Header } from './Header';
+import { StoryPanel } from '@/story/StoryPanel';
 import { Sidebar } from './Sidebar';
 
 export function AppShell() {
@@ -34,6 +35,7 @@ export function AppShell() {
             <Outlet />
           </Suspense>
         </main>
+        <StoryPanel />
         <Footer />
       </div>
     </div>

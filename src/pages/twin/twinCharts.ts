@@ -6,6 +6,7 @@ import { AI_CONFIG, LIMIT_TEMP_C, type Assessment } from '@/ai';
 import type { EChartsOption } from '@/components/charts/echarts';
 import type { ChartColors } from '@/components/charts/useChartColors';
 import type { Timeline } from '@/eval/timeline';
+import { currentLang, formatNumber } from '@/lib/format';
 import { countUpTo, pairs, seriesOf } from '@/lib/timelineSeries';
 import { MODULES, MODULE_COLORS } from './moduleStyle';
 
@@ -17,12 +18,12 @@ export interface ChartBase {
   t: TFunction;
 }
 
-const tooltip = (c: ChartColors, unit = '', digits = 1): NonNullable<EChartsOption['tooltip']> => ({
+const tooltip = (c: ChartColors, lang: string, unit = '', digits = 1): NonNullable<EChartsOption['tooltip']> => ({
   trigger: 'axis',
   backgroundColor: c.surface,
   borderColor: c.border,
   textStyle: { color: c.text, fontSize: 12 },
-  valueFormatter: (v: unknown) => (typeof v === 'number' ? `${v.toFixed(digits)}${unit}` : String(v)),
+  valueFormatter: (v: unknown) => (typeof v === 'number' ? `${formatNumber(v, lang, digits)}${unit}` : String(v)),
   axisPointer: { type: 'line', lineStyle: { color: c.muted } },
 });
 
@@ -118,7 +119,7 @@ export function temperatureOption(b: ChartBase & { showTruth: boolean; etaS: num
     animation: false,
     grid,
     legend: legend(colors, b.showTruth ? [...names, t('twin.charts.trueTemp')] : names),
-    tooltip: tooltip(colors, ' °C'),
+    tooltip: tooltip(colors, currentLang(), ' °C'),
     xAxis: timeAxis(b),
     // Fits the data, but always leaves the 65 degC limit in view.
     yAxis: {
@@ -162,7 +163,7 @@ export function heatOption(b: ChartBase & { showTruth: boolean }): EChartsOption
     animation: false,
     grid,
     legend: legend(colors, names),
-    tooltip: tooltip(colors, ' W'),
+    tooltip: tooltip(colors, currentLang(), ' W'),
     xAxis: timeAxis(b),
     yAxis: valueAxis(colors, 'W', -10),
     series,
@@ -199,7 +200,7 @@ export function cellHeatmapOption(b: ChartBase): EChartsOption {
       textStyle: { color: colors.text, fontSize: 12 },
       formatter: (p: unknown) => {
         const v = (p as { value: [number, number, number] }).value;
-        return `${ys[v[1]]} · ${xs[v[0]]} min: ${v[2].toFixed(1)} mV`;
+        return `${ys[v[1]]} · ${xs[v[0]]} min: ${formatNumber(v[2], currentLang(), 1)} mV`;
       },
     },
     xAxis: {
@@ -251,7 +252,7 @@ export function cellsNowOption(b: ChartBase & { assessment: Assessment | null; i
   return {
     animation: false,
     grid: { left: 52, right: 14, top: 14, bottom: 40 },
-    tooltip: { ...tooltip(colors, ' mV'), trigger: 'item' },
+    tooltip: { ...tooltip(colors, currentLang(), ' mV'), trigger: 'item' },
     xAxis: {
       type: 'category',
       data: dev.map((_, i) => String(i + 1)),
@@ -298,7 +299,7 @@ export function riskOption(b: ChartBase): EChartsOption {
     animation: false,
     grid: { ...grid, bottom: 84 },
     legend: legend(colors, names),
-    tooltip: tooltip(colors, '', 1),
+    tooltip: tooltip(colors, currentLang(), '', 1),
     xAxis: timeAxis(b),
     yAxis: valueAxis(colors, t('twin.risk.title'), 0, 100),
     series,
@@ -320,7 +321,7 @@ export function sohOption(b: ChartBase & { showTruth: boolean }): EChartsOption 
     animation: false,
     grid,
     legend: legend(colors, names),
-    tooltip: tooltip(colors, ' %'),
+    tooltip: tooltip(colors, currentLang(), ' %'),
     xAxis: timeAxis(b),
     yAxis: valueAxis(colors, '% SOH', 50, 100),
     series,

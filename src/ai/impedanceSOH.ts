@@ -49,7 +49,12 @@ export function initImpedance(): ImpedanceState {
   };
 }
 
-const sohFromTheta = (theta1: number): number => clamp(1 - (theta1 - 1) / AGE_GAMMA, 0.5, 1);
+/**
+ * SOH from the resistance relative to a new pack (`theta1`): R grows as 1 + gamma (1 - SOH), so
+ * SOH = 1 - (R / R_new - 1) / gamma. `gamma` is the chemistry's ageing constant; the module uses the
+ * simulator's, and the Evidence screen tests that assumption on real cells.
+ */
+export const sohFromTheta = (theta1: number, gamma: number = AGE_GAMMA): number => clamp(1 - (theta1 - 1) / gamma, 0.5, 1);
 
 export function stepImpedance(
   s: ImpedanceState,

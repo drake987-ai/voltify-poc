@@ -51,7 +51,6 @@
     "pocNotice": "PoC chạy hoàn toàn trên trình duyệt, không có backend. Số liệu là mô phỏng trừ khi màn hình ghi rõ dữ liệu thật."
   },
   "common": {
-    "comingInStage": "Màn hình này sẽ được triển khai ở giai đoạn {{stage}}.",
     "notFoundTitle": "Không tìm thấy trang",
     "notFoundBody": "Đường dẫn này không tồn tại trong bản demo.",
     "backToFleet": "Về trang Tổng quan"
@@ -59,7 +58,8 @@
   "state": {
     "loadingPage": "Đang tải màn hình…",
     "loading": "Đang chạy mô phỏng trong Web Worker…",
-    "error": "Không chạy được mô phỏng: {{message}}"
+    "error": "Không chạy được mô phỏng: {{message}}",
+    "loadingFleet": "Đang khởi tạo đội pin mô phỏng…"
   },
   "brands": {
     "A": "Hãng A (Selex-like)",
@@ -315,6 +315,17 @@
       "isolate": "Cách ly viên pin này sau khi đổi",
       "reduce_charge": "Hạ dòng sạc xuống {{percent}}%",
       "schedule_maintenance": "Xếp lịch bảo dưỡng hoặc điều sang chặng ngắn"
+    },
+    "live": {
+      "note": "Đây là lịch sử của pin này trong đội pin ở màn Tổng quan, dựng lại từ cùng seed {{seed}} và cùng chính sách can thiệp nên khớp từng số đo với màn đó, kể cả lúc Voltify đã hạ công suất hoặc đổi pin.",
+      "backToCases": "Xem các ca mẫu",
+      "notFound": "Đội pin hiện tại không có pin {{id}}."
+    },
+    "fromEvidence": {
+      "note": "Đây là pin {{id}} của một lần chạy ở màn Evidence (kịch bản {{scenario}}, seed {{seed}}), dựng lại với AI chỉ quan sát, không can thiệp.",
+      "short": "Đoản mạch ngầm bắt đầu ở phút {{minutes}}, điện trở đoản mạch giảm tới {{ohm}} ohm.",
+      "back": "Về màn Evidence",
+      "invalid": "Liên kết ca không hợp lệ nên màn hình hiện ca mẫu."
     }
   },
   "pages": {
@@ -361,6 +372,1273 @@
     "market": {
       "title": "Thị trường và Kinh doanh",
       "subtitle": "TAM/SAM/SOM, so sánh đối thủ, UVP, Unfair Advantage, mô hình doanh thu và lộ trình."
+    }
+  },
+  "assumptions": {
+    "packCostVnd": {
+      "label": "Giá thay một pack",
+      "why": "Giá tham khảo của một pack đổi được; pilot sẽ thay bằng giá hợp đồng của khách hàng."
+    },
+    "packDamageFraction": {
+      "label": "Tỷ lệ giá trị pack mất khi quá nhiệt",
+      "why": "Phần giá trị mất do chai nhanh hoặc phải loại bỏ khi pin bị đẩy tới 65°C. Giả định minh họa, chưa có số liệu pilot."
+    },
+    "strandedCostVnd": {
+      "label": "Chi phí một xe chết giữa đường",
+      "why": "Gồm đơn hàng trễ, chuyến cứu hộ và thời gian ca làm việc bị mất. Giả định minh họa."
+    },
+    "rideTempC": {
+      "label": "Nhiệt độ lõi trung bình khi chạy",
+      "why": "Dùng để dự phóng tuổi thọ theo Arrhenius: nhiệt độ cao hơn thì pin chai nhanh hơn."
+    },
+    "efcPerDay": {
+      "label": "Số chu kỳ tương đương mỗi ngày",
+      "why": "Một chu kỳ tương đương (EFC) là một lần xả hết dung lượng định mức. Giá trị mặc định là giả định minh họa."
+    },
+    "chargeShare": {
+      "label": "Tỷ lệ thời gian sạc trong mỗi chu kỳ",
+      "why": "Phần mỗi chu kỳ tương đương diễn ra ở chế độ sạc (phần còn lại là xả); dùng để dự phóng vòng đời khi so sánh tủ sạc."
+    }
+  },
+  "fleet": {
+    "controls": {
+      "reset": "Đặt lại",
+      "size": "Quy mô đội pin",
+      "sizes": {
+        "300": "300 pin (mặc định)",
+        "2000": "2.000 pin (thử hiệu năng bản đồ)"
+      },
+      "clock": "Đồng hồ mô phỏng",
+      "effective": "tốc độ thực tế {{speed}}×",
+      "paused": "đang tạm dừng",
+      "seed": "seed {{seed}}"
+    },
+    "map": {
+      "aria": "Bản đồ vị trí và mức rủi ro của từng pin",
+      "offline": "Đang offline: không tải được nền bản đồ OpenStreetMap, hiển thị lưới đơn giản.",
+      "cityHcmc": "TP.HCM",
+      "cityHanoi": "Hà Nội",
+      "legendTitle": "Chú giải mức rủi ro (hình dạng kèm màu)",
+      "note": "{{n}} pin mô phỏng di chuyển theo tuyến giả. Bấm vào một điểm để xem chi tiết."
+    },
+    "filters": {
+      "city": "Thành phố",
+      "brand": "Hãng pin"
+    },
+    "kpi": {
+      "meanSoh": "Độ chai trung bình (SOH)",
+      "alerts": "Cảnh báo đã phát",
+      "swaps": "Pin đã được đổi",
+      "prevented": "Sự cố ngăn chặn",
+      "savings": "Tiền tiết kiệm ước tính",
+      "ofTotal": "trên {{total}} pin",
+      "clickHint": "Bấm để xem công thức"
+    },
+    "units": {
+      "millionVnd": "{{value}} triệu ₫",
+      "vnd": "{{value}} ₫"
+    },
+    "trace": {
+      "title": "Cách tính: {{name}}",
+      "close": "Đóng",
+      "names": {
+        "levels": "số pin theo mức rủi ro",
+        "meanSoh": "độ chai trung bình (SOH)",
+        "alerts": "cảnh báo đã phát",
+        "swaps": "pin đã được đổi",
+        "prevented": "sự cố ngăn chặn",
+        "savings": "tiền tiết kiệm ước tính"
+      },
+      "formulas": {
+        "levels": "Đếm số pin theo mức Risk Score hiện tại: An toàn dưới 25, Theo dõi từ 25, Cảnh báo từ 50, Nguy hiểm từ 75 (có hysteresis để mức không nhảy qua lại). Pin AI còn đang học được tính vào An toàn cho tới khi có đủ dữ liệu.",
+        "meanSoh": "Trung bình SOH ước lượng từ nội trở (RLS, quy về 25°C) của các pin đã qua giai đoạn học. Pin đang học không được tính. Đây là ước lượng trên dữ liệu mô phỏng.",
+        "alerts": "Số lần một pin vượt lên mức Cảnh báo (Risk Score từ 50) kể từ lúc bắt đầu mô phỏng. Mỗi lần chuyển mức tính một lần.",
+        "swaps": "Số pin đã được đổi tại trạm theo chính sách can thiệp: cảnh báo, hạ công suất 15% sau 10 giây, báo shipper, đổi pin sau thời gian phản ứng của shipper cộng quãng đường tới trạm cộng 90 giây thao tác.",
+        "prevented": "Sự cố ngăn chặn = số pin mà BMS truyền thống đã ngắt ở 65°C trong đội đối chứng (cùng seed, cùng kịch bản, không can thiệp) nhưng không bị ngắt trong đội có Voltify. Chỉ đếm những gì đo được trong mô phỏng.",
+        "savings": "Tiền tiết kiệm = số sự cố ngăn chặn × (giá pack × tỷ lệ giá trị mất khi quá nhiệt + chi phí một xe chết giữa đường). Các hệ số là giả định minh họa, liệt kê bên dưới."
+      },
+      "tripsBaseline": "BMS đã ngắt, đội đối chứng",
+      "tripsVoltify": "BMS đã ngắt, đội có Voltify",
+      "packLoss": "Giá trị pack giữ lại ({{count}} sự cố)",
+      "stranded": "Chi phí xe chết giữa đường tránh được ({{count}} sự cố)",
+      "assumptions": "Giả định (minh họa)",
+      "placeholder": "Đây là giả định minh họa để PoC chạy được, không phải số liệu của khách hàng thật. Pilot sẽ thay bằng số thực; màn ROI cho chỉnh các giá trị này.",
+      "counterfactual": "Đội đối chứng chạy song song trong cùng một mô phỏng nhưng không có can thiệp nào, nên con số này là phép so sánh trực tiếp chứ không phải ước đoán."
+    },
+    "alerts": {
+      "title": "Cảnh báo trực tiếp",
+      "empty": "Chưa có cảnh báo nào. Cảnh báo xuất hiện khi một pin vượt lên mức Cảnh báo."
+    },
+    "selected": {
+      "title": "Pin đang chọn",
+      "none": "Bấm vào một điểm trên bản đồ hoặc một cảnh báo để xem chi tiết.",
+      "roleLabel": "Vai trò trong mô phỏng",
+      "roles": {
+        "normal": "Vận hành bình thường trong ngày nắng 43°C.",
+        "severe": "Quá tải trong nắng nóng: pin chai, chở nặng, leo dốc.",
+        "short": "Đoản mạch ngầm được tiêm vào giữa phiên chạy.",
+        "heavy": "Chở nặng và leo dốc.",
+        "aged": "Pin chai cao.",
+        "weakCell": "Có cell mất cân bằng."
+      },
+      "openTwin": "Mở Digital Twin",
+      "openVitals": "Mở bốn chỉ số",
+      "status": {
+        "learning": "AI đang học",
+        "derating": "Đang hạ công suất 15%",
+        "swapped": "Đã đổi pin",
+        "tripped": "BMS đã ngắt"
+      }
+    }
+  },
+  "vitals": {
+    "controls": {
+      "battery": "Chọn pin",
+      "hint": "Cùng đội pin đang chạy ở màn Tổng quan nên các chỉ số cập nhật theo đồng hồ mô phỏng. Tốc độ và tạm dừng đặt ở màn Tổng quan."
+    },
+    "soc": {
+      "title": "% pin hiện tại (SOC)",
+      "explain": "SOC là phần điện năng còn lại so với lúc đầy, như vạch xăng của xe. Voltify ước lượng số phút chạy còn lại theo mức tiêu thụ gần đây, rồi đặt cạnh khoảng cách tới trạm đổi pin gần nhất.",
+      "idle": "Xe đang gần như không tải nên chưa ước lượng được thời gian chạy còn lại.",
+      "remaining": "Còn chạy được khoảng {{minutes}} phút ở mức tải gần đây.",
+      "station": "Trạm đổi pin gần nhất {{id}}: cách {{distance}} m, khoảng {{minutes}} phút chạy.",
+      "alertReach": "Điện còn ít so với quãng đường tới trạm: nên đổi pin ngay.",
+      "alertSwap": "Pin sắp cạn: nên đổi pin ở trạm gần nhất."
+    },
+    "health": {
+      "title": "Độ chai pin (SOH)",
+      "explain": "SOH cho biết pin còn dùng được bao nhiêu phần dung lượng so với lúc mới. Voltify ước lượng từ nội trở: pin càng chai thì nội trở càng cao. Phân loại giúp xếp pin tốt đi đường dài, pin yếu đi chặng ngắn hoặc đưa đi bảo dưỡng.",
+      "route": {
+        "long": "Nên dùng cho đường dài.",
+        "medium": "Phù hợp chặng vừa.",
+        "short": "Chỉ nên chạy chặng ngắn hoặc đưa đi bảo dưỡng."
+      },
+      "confidence": "Độ tin cậy của ước lượng: {{percent}}%"
+    },
+    "safety": {
+      "title": "An toàn và rủi ro cháy nổ",
+      "explain": "Risk Score (0 đến 100) gộp bốn module AI: xu hướng nhiệt, điện áp cell, quá tải và nội trở. Điểm càng cao càng cần can thiệp sớm. Các tín hiệu đóng góp nhiều nhất được liệt kê bên dưới.",
+      "noEta": "Chưa dự báo chạm ngưỡng 65°C.",
+      "eta": "Dự báo chạm 65°C sau khoảng {{minutes}} phút nếu giữ nguyên tải."
+    },
+    "discharge": {
+      "title": "Hiệu suất xả",
+      "explain": "Điểm hiệu suất xả cho biết pin cấp điện hiệu quả đến đâu. Nội trở cao làm hao điện thành nhiệt; cell yếu hoặc lệch giữa các cell làm giảm phần công suất dùng được. Mỗi nguyên nhân trừ vào điểm theo trọng số cố định (50% nội trở, 25% cell yếu, 25% mất cân bằng).",
+      "efficiency": "Hiệu suất truyền điện",
+      "idleLoad": "chưa có tải",
+      "loss": "Công suất hao thành nhiệt",
+      "parts": "Điểm bị trừ vì",
+      "points": "−{{points}} điểm",
+      "penalty": {
+        "resistance": "Nội trở cao",
+        "weakCell": "Cell yếu",
+        "balance": "Cell mất cân bằng"
+      },
+      "balance": "Nên chạy một lượt cân bằng cell (balancing) cho pin này ở lần sạc tiếp theo; đây là việc bảo trì, không phải nguy cơ cháy."
+    },
+    "fleet": {
+      "title": "Cả đội pin: phân bố bốn chỉ số",
+      "soc": "% pin hiện tại (SOC)",
+      "health": "Độ chai pin (SOH)",
+      "safety": "Mức rủi ro",
+      "discharge": "Điểm hiệu suất xả",
+      "dischargeNote": "Không tính pin AI còn đang học."
+    }
+  },
+  "intervention": {
+    "phases": {
+      "title": "Hai giai đoạn triển khai (Known limits & Roadmap)",
+      "one": "Giai đoạn 1 (pilot): chỉ giám sát và cảnh báo. Voltify báo cho shipper và quản lý đội xe qua ứng dụng, không điều khiển xe, nên không cần hãng xe mở quyền điều khiển.",
+      "two": "Giai đoạn 2: gửi lệnh ngược về xe (ví dụ hạ công suất xả 15%) và tới tủ sạc. Cần thỏa thuận kỹ thuật với hãng xe và nhà sản xuất BMS. Màn này mô phỏng cả hai giai đoạn để cho thấy giá trị của can thiệp."
+    },
+    "controls": {
+      "hint": "Chọn hãng pin để xem câu chuyện can thiệp của một pin thuộc hãng đó. Xe dùng cùng kịch bản và seed với màn BMS truyền thống vs Voltify, nên số liệu hai màn đối chiếu được với nhau."
+    },
+    "vehicle": {
+      "title": "Xe đang chạy: từ cảnh báo đến đổi pin",
+      "intro": "Kịch bản ngày nắng 43°C, pin chai, chở nặng, leo dốc. Khi Risk Score đạt mức Cảnh báo, Voltify gửi lệnh hạ công suất xuống xe, báo shipper đổi pin tại trạm gần nhất còn pin mát, rồi ghi nhận lần đổi pin. Mọi mốc thời gian lấy từ mô phỏng.",
+      "stats": {
+        "derate": "Lệnh hạ công suất lúc",
+        "derateHint": "Hạ {{percent}}% công suất xả, sau độ trễ truyền lệnh",
+        "swap": "Đổi pin xong lúc",
+        "swapHint": "Sau khi shipper phản ứng, chạy tới trạm và thao tác đổi pin",
+        "peak": "Nhiệt lõi cao nhất",
+        "peakHint": "Tính tới thời điểm đang phát"
+      },
+      "logTitle": "Nhật ký lệnh gửi xuống xe",
+      "policyTitle": "Quy trình can thiệp (tham số mô phỏng)",
+      "policy": {
+        "alert": "AI phát hiện Risk Score đạt mức Cảnh báo (từ 50 điểm).",
+        "derate": "Sau {{seconds}} giây (độ trễ từ cloud tới máy chủ hãng xe rồi tới BMS), lệnh hạ công suất xả {{percent}}% có hiệu lực.",
+        "notify": "Cùng lúc, ứng dụng shipper nhận thông báo kèm trạm gần nhất còn pin mát; một pin mát được giữ sẵn.",
+        "swap": "Shipper phản ứng sau {{reaction}} giây, chạy với tốc độ {{speed}} km/h theo đường thẳng tới trạm, rồi mất {{handling}} giây để đổi pin."
+      }
+    },
+    "phone": {
+      "aria": "Mockup ứng dụng của shipper",
+      "fine": "Pin đang ổn định",
+      "fineHint": "Ứng dụng chỉ báo khi Voltify thấy cần hành động. Bấm Phát để xem điều gì xảy ra.",
+      "alertTitle": "Pin nóng bất thường: cần đổi pin",
+      "alertBody": "Nhiệt lõi pin {{temp}} °C và đang tăng. Hệ thống đã hạ công suất {{percent}}% để giữ an toàn. Hãy đổi pin tại trạm {{station}}, cách {{distance}} m. Một pin mát đã được giữ sẵn cho bạn.",
+      "alertBodyNoStation": "Pin nóng bất thường. Hệ thống đã hạ công suất {{percent}}%. Hãy đổi pin tại trạm gần nhất.",
+      "doneTitle": "Đã đổi pin",
+      "doneBody": "Pin nóng nằm lại trạm để làm mát, không còn tải. Bạn có thể tiếp tục giao hàng.",
+      "mapAria": "Sơ đồ đường thẳng từ vị trí của bạn tới trạm đổi pin",
+      "caption": "Mockup ứng dụng shipper. Đường đi là đường thẳng mà mô phỏng giả định, không phải dẫn đường thật.",
+      "steps": {
+        "derate": "Đã hạ công suất {{percent}}%",
+        "ride": "Chạy tới trạm {{station}} (còn {{distance}} m)",
+        "rideNearest": "Chạy tới trạm đổi pin gần nhất",
+        "swap": "Đổi pin tại trạm",
+        "resume": "Tiếp tục giao hàng",
+        "arrived": "Đã tới trạm {{station}}"
+      },
+      "tabs": {
+        "pack": "Pin",
+        "stations": "Trạm",
+        "orders": "Đơn hàng"
+      },
+      "appName": "Voltify Rider"
+    },
+    "log": {
+      "note": "Ví dụ định dạng thông điệp do mô phỏng tạo ra để minh họa; giao thức thật phụ thuộc từng hãng xe và BMS.",
+      "empty": "Chưa có lệnh nào được gửi. Bấm Phát để chạy kịch bản.",
+      "channels": {
+        "platform": "Nền tảng Voltify",
+        "vehicle": "Xe / BMS",
+        "app": "App shipper",
+        "station": "Trạm đổi pin",
+        "cabinet": "Tủ sạc"
+      },
+      "kinds": {
+        "ai_alert": "Voltify cảnh báo: Risk Score đạt mức Cảnh báo",
+        "derate_sent": "Lệnh hạ công suất xả gửi xuống xe",
+        "shipper_notified": "Thông báo đẩy tới shipper: đổi pin tại trạm đã giữ pin mát",
+        "shipper_notified_nostation": "Thông báo đẩy tới shipper: đổi pin tại trạm gần nhất",
+        "swap_done": "Trạm xác nhận đã đổi pin; pin nóng nằm lại để làm mát",
+        "bms_trip": "BMS ngắt nguồn vì lõi pin chạm 65°C",
+        "vehicle_stopped": "Xe chết máy giữa đường",
+        "charge_reduced": "Lệnh hạ dòng sạc gửi tới tủ sạc",
+        "charge_adjusted": "Lệnh điều chỉnh dòng sạc",
+        "charge_restored": "Lệnh trả dòng sạc về mức đầy (pin đã mát hoặc sạc xong)"
+      }
+    },
+    "cabinet": {
+      "title": "Tủ sạc: hạ dòng sạc khi pin quá nóng",
+      "intro": "Cùng một pin, cùng seed, cùng tủ sạc nhanh đặt ngoài nắng, chạy hai lần: tủ sạc thông thường, và tủ sạc có Voltify hạ dòng sạc theo đường cong derating theo nhiệt độ. Hai lần chạy giống hệt nhau cho tới lệnh đầu tiên.",
+      "worlds": {
+        "without": "Tủ sạc thông thường",
+        "with": "Tủ sạc có Voltify"
+      },
+      "slot": "ngăn {{slot}}",
+      "currentNow": "Dòng sạc",
+      "status": {
+        "idle": "Chờ",
+        "finished": "Đã sạc xong",
+        "reduced": "Đã hạ dòng sạc còn {{percent}}% mức yêu cầu",
+        "hot": "Đang sạc, pin nóng",
+        "charging": "Đang sạc"
+      },
+      "axisTime": "Thời gian sạc (phút)",
+      "axisTemp": "Nhiệt lõi (°C)",
+      "axisCurrent": "Dòng sạc (A)",
+      "chartTemp": "Nhiệt lõi pin khi sạc",
+      "chartCurrent": "Dòng sạc",
+      "marks": {
+        "charge_reduced": "Hạ dòng sạc",
+        "charge_adjusted": "Chỉnh dòng sạc",
+        "charge_restored": "Trả dòng sạc"
+      },
+      "notFull": "chưa đầy trong thời gian mô phỏng",
+      "minutes": "{{minutes}} phút",
+      "days": "{{days}} ngày",
+      "kpi": {
+        "title": "So sánh hai lần sạc",
+        "change": "Thay đổi",
+        "peak": "Nhiệt lõi cao nhất khi sạc",
+        "mean": "Nhiệt lõi trung bình khi sạc",
+        "full": "Thời gian tới 98% SOC",
+        "fade": "Hao mòn dung lượng mỗi chu kỳ (trong lúc sạc)",
+        "life": "Tuổi thọ dự phóng của pin (tới SOH 80%)"
+      },
+      "trace": {
+        "title": "Cách tính tuổi thọ dự phóng",
+        "formula": "Hao mòn mỗi chu kỳ tương đương = tỷ lệ sạc × hao mòn khi sạc + (1 − tỷ lệ sạc) × hao mòn khi chạy. Số chu kỳ tới SOH 80% = 20% / hao mòn mỗi chu kỳ. Số ngày = số chu kỳ / số chu kỳ mỗi ngày. Hao mòn khi sạc đo từ mô phỏng (trung bình có trọng số theo dòng); hao mòn khi chạy theo phương trình Arrhenius ở nhiệt độ chạy giả định.",
+        "chargeFade": "Hao mòn khi sạc: {{world}}",
+        "rideFade": "Hao mòn khi chạy ở {{temp}}°C",
+        "mixedFade": "Hao mòn mỗi chu kỳ: {{world}}",
+        "efc": "Số chu kỳ tới SOH 80%: {{world}}"
+      },
+      "logTitle": "Nhật ký lệnh gửi tới tủ sạc",
+      "notes": {
+        "title": "Điều cần biết",
+        "scenario": "Kịch bản: tủ sạc nhanh (1C) đặt ngoài nắng, nhiệt độ trong tủ 46 đến 50°C, pin chai (SOH 78%) vào sạc khi đã nóng hơn môi trường vài độ. Đây là tình huống khắc nghiệt có chủ ý.",
+        "tradeoff": "Đánh đổi: giữ pin trong đường cong derating làm sạc đầy lâu hơn khoảng {{ratio}} lần so với sạc hết dòng.",
+        "tradeoffUnknown": "Đánh đổi: một trong hai lần sạc chưa đầy trong thời gian mô phỏng.",
+        "projection": "Tuổi thọ dài hơn khoảng {{gain}}% là dự phóng từ mô hình lão hóa Arrhenius với các giả định ở trên, không phải kết quả đo thực tế. Mục tiêu kéo dài tuổi thọ pin khoảng 35% cần được xác nhận qua pilot.",
+        "cooling": "Hạ dòng sạc chỉ là một lớp bảo vệ; làm mát tủ và dời giờ sạc sang lúc mát hơn là các hướng bổ sung, chưa được mô phỏng trong PoC này.",
+        "window": "Hiển thị tới {{end}} (phút:giây) của phiên mô phỏng, seed {{seed}}."
+      }
+    }
+  },
+  "hub": {
+    "pipeline": {
+      "title": "Đường đi của một gói tin",
+      "steps": {
+        "sources": {
+          "title": "3 nguồn dữ liệu thô",
+          "desc": "Mỗi hãng gửi telemetry bằng định dạng riêng: tên trường, đơn vị, dấu của dòng điện, kiểu thời gian và tần suất đều khác nhau."
+        },
+        "adapter": {
+          "title": "Adapter chuẩn hóa",
+          "desc": "Nhận dạng hãng từ hình dạng gói, đổi đơn vị và dấu, dựng lại từng cell. Gói hỏng bị từ chối kèm lý do, không làm dừng dòng dữ liệu."
+        },
+        "schema": {
+          "title": "Một schema chung (Telemetry)",
+          "desc": "Mọi thứ phía sau adapter chỉ thấy một dạng dữ liệu: mã pin, thời gian, điện áp từng cell, dòng, nhiệt, SOC, vị trí."
+        },
+        "ai": {
+          "title": "Một AI Engine",
+          "desc": "Cùng bốn module và một thang Risk Score cho mọi hãng, nên cảnh báo của các hãng so sánh được với nhau."
+        }
+      }
+    },
+    "scenarioNote": "Ba pin của ba hãng cùng chạy kịch bản Quá tải trong nắng nóng (seed 202, mô phỏng 10 phút); mỗi pin báo về theo định dạng của hãng nó.",
+    "feeds": {
+      "title": "Ba nguồn dữ liệu thô thành một schema",
+      "intro": "Phía trên: gói tin đúng như máy chủ của hãng gửi đi. Phía dưới: kết quả sau adapter. Gói mới nhất được cập nhật theo đồng hồ mô phỏng.",
+      "cadence": "Báo {{seconds}} giây một lần",
+      "size": "khoảng {{bytes}} byte mỗi gói",
+      "shape": {
+        "A": "JSON phẳng, tên trường snake_case, điện áp từng cell theo mV, dòng xả dương.",
+        "B": "JSON lồng nhau, tên trường camelCase, thời gian ISO-8601, dòng sạc dương (ngược quy ước chuẩn).",
+        "C": "Mảng định vị gọn gắn nhãn C1; chỉ gửi điện áp pack và độ lệch từng cell, nhiệt độ độ phân giải 0,5°C."
+      },
+      "raw": "Gói thô từ máy chủ hãng",
+      "last": "gói lúc {{time}}",
+      "none": "Chưa có gói nào tới (bấm Phát).",
+      "rawAria": "Gói thô của {{brand}}",
+      "adapterArrow": "Adapter",
+      "canonical": "Sau adapter: Telemetry chuẩn hóa",
+      "canonicalAria": "Telemetry chuẩn hóa của {{brand}}"
+    },
+    "mapping": {
+      "title": "Bảng ánh xạ trường: ai gửi gì, đổi thế nào",
+      "intro": "Mỗi dòng là một trường của schema chuẩn. Trong ô của từng hãng: vị trí trong gói tin (màu xanh), đơn vị hoặc cách mã hóa của hãng, và phép đổi. Thêm một hãng mới nghĩa là viết thêm một adapter, phần AI không đổi.",
+      "canonical": "Trường chuẩn",
+      "fields": {
+        "batteryId": "Mã pin",
+        "ts": "Thời điểm đo",
+        "cellVoltages": "Điện áp từng cell",
+        "current": "Dòng (xả dương)",
+        "coreTemp": "Nhiệt lõi",
+        "ambientTemp": "Nhiệt môi trường",
+        "soc": "% pin hiện tại (SOC)",
+        "position": "Vị trí GPS",
+        "cycleCount": "Số chu kỳ"
+      }
+    },
+    "unified": {
+      "title": "Màn hình thống nhất",
+      "intro": "Cùng một bảng, cùng đơn vị, cho cả ba hãng. Điện áp pack là tổng điện áp các cell; chênh lệch cell là cell cao nhất trừ cell thấp nhất.",
+      "rows": {
+        "batteryId": "Mã pin",
+        "interval": "Chu kỳ báo",
+        "soc": "% pin hiện tại (SOC)",
+        "coreTemp": "Nhiệt lõi",
+        "current": "Dòng (xả dương)",
+        "packV": "Điện áp pack",
+        "spread": "Chênh lệch cell",
+        "score": "Risk Score",
+        "signal": "Tín hiệu chính",
+        "alert": "Cảnh báo lúc"
+      },
+      "seconds": "{{seconds}} giây",
+      "chartTitle": "Risk Score của ba hãng trên một thang",
+      "chartIntro": "Ba hãng gửi dữ liệu thưa dày khác nhau (5, 10 và 15 giây) nhưng đi qua cùng một AI nên điểm số cùng thang. Mỗi hãng một kiểu nét và ký hiệu.",
+      "axisTime": "Thời gian (phút)",
+      "axisScore": "Risk Score (0 đến 100)",
+      "warnLine": "Mức Cảnh báo ({{score}})"
+    },
+    "fidelity": {
+      "title": "Mất gì khi quy đổi? Độ lệch so với giá trị cảm biến",
+      "intro": "Mỗi định dạng làm tròn dữ liệu theo cách riêng. Bảng so sánh kết quả sau adapter với giá trị cảm biến của mô phỏng (trung bình và lớn nhất trên cả phiên). Đây là số kiểm chứng; AI không được thấy giá trị cảm biến này.",
+      "rows": {
+        "cellMv": "Điện áp cell",
+        "coreTempC": "Nhiệt lõi",
+        "currentA": "Dòng",
+        "socPct": "SOC"
+      },
+      "meanMax": "TB {{mean}}, tối đa {{max}} {{unit}}",
+      "note": "Hãng C gửi thô hơn (0,5°C, SOC theo phần trăm nguyên, cell dựng lại từ điện áp pack và độ lệch) nên sai số lớn hơn; ở kịch bản này AI vẫn cảnh báo hãng C trong khoảng thời gian gần với hai hãng kia. AI dùng timestamp của từng gói chứ không giả định bước thời gian đều."
+    },
+    "try": {
+      "title": "Thử với gói tin của bạn",
+      "intro": "Chọn một mẫu hoặc sửa JSON ở ô bên trái. Adapter nhận dạng hãng từ hình dạng gói và chuẩn hóa nó, hoặc từ chối kèm lý do mà không bị lỗi.",
+      "sample": "Mẫu",
+      "samples": {
+        "implausible": "Hỏng: giá trị vô lý (nhiệt 900°C)",
+        "nonNumeric": "Hỏng: chữ thay cho số",
+        "unknown": "Hỏng: định dạng lạ",
+        "brokenJson": "Hỏng: JSON bị cắt giữa chừng"
+      },
+      "input": "Gói tin (JSON)",
+      "result": "Kết quả",
+      "recognised": "Nhận dạng: {{brand}}",
+      "errors": {
+        "invalid_json": {
+          "title": "Không đọc được JSON",
+          "body": "Văn bản không phải JSON hợp lệ, ví dụ bị cắt giữa chừng khi mất kết nối. Gói này bị bỏ qua và các gói khác vẫn được xử lý."
+        },
+        "unknown_format": {
+          "title": "Định dạng lạ",
+          "body": "Hình dạng gói không khớp hãng nào đã biết. Cần viết thêm một adapter cho hãng này."
+        },
+        "malformed": {
+          "title": "Gói thiếu hoặc sai kiểu trường",
+          "body": "Nhận dạng được hãng, nhưng một trường bị thiếu hoặc không phải số."
+        },
+        "out_of_range": {
+          "title": "Giá trị ngoài giới hạn vật lý",
+          "body": "Một giá trị (ví dụ nhiệt độ) nằm ngoài khoảng hợp lý nên bị coi là lỗi cảm biến chứ không phải dữ liệu."
+        }
+      }
+    },
+    "limits": {
+      "title": "Giới hạn đã biết",
+      "fictional": "Ba hãng ở đây là hãng giả định (tên có hậu tố like); định dạng được viết theo mô tả giả định, không phải đặc tả thật của hãng nào.",
+      "adapter": "Với hãng thật, mỗi hãng cần một adapter riêng và một thỏa thuận API. Thời gian làm việc này chưa được đo trong PoC.",
+      "moat": "Giá trị cạnh tranh nằm ở engine dùng chung cho nhiều hãng (Cross-brand Digital Twin), không nằm ở việc đọc một định dạng."
+    }
+  },
+  "roi": {
+    "units": {
+      "billion": "{{value}} tỷ ₫",
+      "packs": "pin",
+      "cyclesPerDay": "chu kỳ/ngày",
+      "vndPerKwh": "₫/kWh",
+      "perThousand": "trên 1.000 pin/năm"
+    },
+    "fields": {
+      "packs": {
+        "label": "Số pin",
+        "why": "Số pin của đội xe hoặc mạng trạm cần giám sát. Mặc định là một quy mô minh họa."
+      },
+      "packCostVnd": {
+        "label": "Giá một pin (₫)",
+        "why": "Giá thay một pin; dùng chung giá trị với màn Tổng quan. Thay bằng giá hợp đồng thực."
+      },
+      "rideTempC": {
+        "label": "Nhiệt độ vận hành trung bình (°C)",
+        "why": "Nhiệt lõi pin trung bình khi vận hành; quyết định tốc độ chai pin theo Arrhenius."
+      },
+      "efcPerDay": {
+        "label": "Số chu kỳ mỗi ngày",
+        "why": "Một chu kỳ tương đương là một lần xả hết dung lượng định mức. Shipper chạy nhiều giờ mỗi ngày nên thường nhiều hơn một chu kỳ; mặc định là giả định minh họa."
+      },
+      "saasFeeVndPerPackMonth": {
+        "label": "Phí SaaS mỗi pin mỗi tháng (₫)",
+        "why": "Giá bán là lựa chọn kinh doanh chưa chốt; mặc định chỉ để tính thử."
+      },
+      "chargeShare": {
+        "label": "Tỷ lệ thời gian sạc trong mỗi chu kỳ",
+        "why": "Phần mỗi chu kỳ diễn ra khi sạc; dùng để tính lợi ích của việc sạc mát hơn."
+      },
+      "packKwh": {
+        "label": "Dung lượng một pin (kWh)",
+        "why": "Pack 16S5P dùng cell 21700 trong mô phỏng khoảng 1,4 kWh."
+      },
+      "electricityVndPerKwh": {
+        "label": "Giá điện (₫/kWh)",
+        "why": "Giá điện của trạm sạc; giả định minh họa, cần thay bằng hóa đơn thực."
+      },
+      "chargeEfficiency": {
+        "label": "Hiệu suất sạc (từ lưới tới pin)",
+        "why": "Phần điện lấy từ lưới thực sự vào pin; phần còn lại thành nhiệt ở bộ sạc và pin."
+      },
+      "incidentsPerThousandPacksYear": {
+        "label": "Sự cố BMS ngắt giữa đường (trên 1.000 pin mỗi năm)",
+        "why": "Tần suất nền chưa có số liệu thực; mặc định chỉ để minh họa và cần thay bằng dữ liệu vận hành của khách hàng."
+      },
+      "packDamageFraction": {
+        "label": "Tỷ lệ giá trị pin mất khi quá nhiệt",
+        "why": "Phần giá trị mất do chai nhanh hoặc phải loại bỏ khi pin bị đẩy tới 65°C. Dùng chung với màn Tổng quan."
+      },
+      "strandedCostVnd": {
+        "label": "Chi phí một xe chết giữa đường (₫)",
+        "why": "Gồm đơn hàng trễ, chuyến cứu hộ và thời gian ca làm việc bị mất. Dùng chung với màn Tổng quan."
+      },
+      "onboardingVndPerPack": {
+        "label": "Chi phí triển khai ban đầu mỗi pin (₫)",
+        "why": "Công tích hợp API và cài đặt, tính một lần. Giả định minh họa."
+      }
+    },
+    "inputs": {
+      "title": "Đầu vào",
+      "reset": "Đặt lại",
+      "intro": "Năm ô đầu là đầu vào chính. Mọi giá trị đều chỉnh được và kết quả bên phải tính lại ngay. Các mặc định chỉ là giả định minh họa.",
+      "advanced": "Giả định chi tiết"
+    },
+    "measured": {
+      "title": "Số đo từ mô phỏng",
+      "intro": "Trường hợp Thận trọng chỉ dùng hai số đo được từ mô phỏng của PoC. Chúng chạy trong Web Worker và có thể mất vài giây.",
+      "pending": "Đang đo trong Web Worker…",
+      "cooling": {
+        "title": "Giảm nhiệt độ khi sạc",
+        "body": "Tủ sạc nhanh ngoài nắng: nhiệt lõi trung bình khi sạc là {{withCut}}°C khi Voltify hạ dòng sạc, so với {{without}}°C nếu không can thiệp, tức giảm {{drop}}°C."
+      },
+      "prevention": {
+        "title": "Sự cố ngăn chặn",
+        "body": "Trong đội {{packs}} pin mô phỏng chạy {{minutes}} phút, BMS truyền thống ngắt {{trips}} pin ở đội đối chứng; Voltify ngăn được {{prevented}} (tỷ lệ {{rate}}%).",
+        "none": "Trong đội {{packs}} pin mô phỏng chạy {{minutes}} phút, BMS truyền thống không phải ngắt pin nào nên chưa có tỷ lệ."
+      },
+      "caveat": "Cỡ mẫu nhỏ (vài sự cố) và các pin gặp sự cố được dựng sẵn trong đội mô phỏng, nên đây là số đo trên mô phỏng chứ không phải tỷ lệ ngoài thực tế. Có thể chỉnh ở bảng bên phải."
+    },
+    "cases": {
+      "careful": {
+        "title": "Thận trọng",
+        "desc": "Chỉ tính những gì PoC đo được"
+      },
+      "target": {
+        "title": "Mục tiêu",
+        "desc": "Theo mục tiêu của brief, cần xác nhận qua pilot"
+      }
+    },
+    "levers": {
+      "title": "Hai trường hợp: thận trọng và mục tiêu",
+      "intro": "Chỉ ba đại lượng khác nhau giữa hai trường hợp. Mỗi ô ghi rõ giá trị đến từ đâu: đo được từ mô phỏng, mục tiêu của brief cần pilot xác nhận, hay do bạn nhập.",
+      "rows": {
+        "lifeExtensionPct": "Kéo dài tuổi thọ pin",
+        "electricitySavingPct": "Giảm chi phí điện năng của trạm",
+        "preventionPct": "Tỷ lệ sự cố được ngăn chặn"
+      },
+      "why": {
+        "lifeExtensionPct": "Pin dùng được lâu hơn bao nhiêu phần trăm so với không có Voltify.",
+        "electricitySavingPct": "Phần hóa đơn điện sạc pin được tiết kiệm.",
+        "preventionPct": "Phần sự cố BMS ngắt giữa đường mà Voltify ngăn được."
+      },
+      "sources": {
+        "measured": "Đo từ mô phỏng",
+        "target": "Mục tiêu, cần pilot",
+        "unmeasured": "Chưa đo, tính bằng 0",
+        "pending": "Đang đo…",
+        "override": "Bạn đã nhập"
+      },
+      "resetOne": "Dùng lại giá trị mặc định",
+      "derived": "Từ mức giảm nhiệt khi sạc {{drop}}°C, qua mô hình Arrhenius"
+    },
+    "results": {
+      "title": "Kết quả mỗi năm",
+      "intro": "Hai trường hợp cạnh nhau, tính từ các đầu vào bên trái. Bấm vào tên một chỉ số để xem công thức và các con số đã thay vào.",
+      "clickHint": "Mọi con số đều truy ngược được: bấm vào tên chỉ số để xem công thức, đầu vào và giả định."
+    },
+    "outputs": {
+      "replacement": {
+        "label": "Chi phí thay pin tiết kiệm",
+        "hint": "Số pin phải thay mỗi năm giảm đi khi pin bền hơn, nhân giá một pin"
+      },
+      "life": {
+        "label": "Tuổi thọ pin kéo dài",
+        "hint": "Từ tuổi thọ dự báo theo nhiệt độ và số chu kỳ (tới SOH 80%)"
+      },
+      "energy": {
+        "label": "Điện năng tiết kiệm",
+        "hint": "Hóa đơn điện sạc pin mỗi năm nhân tỷ lệ tiết kiệm"
+      },
+      "incidents": {
+        "label": "Sự cố ngăn chặn",
+        "hint": "Sự cố BMS ngắt giữa đường mỗi năm mà Voltify ngăn được"
+      },
+      "net": {
+        "label": "Lợi ích ròng sau phí SaaS",
+        "hint": "Tổng tiết kiệm trừ phí thuê bao"
+      },
+      "payback": {
+        "label": "Thời gian hoàn vốn",
+        "hint": "Chi phí triển khai ban đầu chia cho lợi ích ròng mỗi tháng"
+      }
+    },
+    "values": {
+      "perYear": "mỗi năm",
+      "lifeFromTo": "từ {{from}} lên {{to}} ngày",
+      "incidents": "{{count}} sự cố/năm",
+      "incidentsWorth": "tương đương {{value}} mỗi năm",
+      "perFee": "lợi ích gấp {{ratio}} lần phí SaaS",
+      "noPayback": "không hoàn vốn",
+      "months": "{{months}} tháng",
+      "onboarding": "chi phí triển khai {{value}}"
+    },
+    "trace": {
+      "title": "Cách tính: {{name}}",
+      "formulas": {
+        "replacement": "Số pin phải thay mỗi năm = số pin × 365 / tuổi thọ (ngày). Tiết kiệm = (số pin thay trước trừ sau) × giá một pin, với tuổi thọ có Voltify = tuổi thọ trước × (1 + mức kéo dài).",
+        "life": "Tuổi thọ (ngày) = (1 trừ SOH cuối đời 0,8) / hao mòn mỗi chu kỳ / số chu kỳ mỗi ngày. Hao mòn mỗi chu kỳ theo Arrhenius (Ea 20 kJ/mol) ở nhiệt độ vận hành. Tuổi thọ có Voltify = tuổi thọ × (1 + mức kéo dài).",
+        "energy": "Điện năng mỗi năm (kWh) = số pin × chu kỳ mỗi ngày × 365 × kWh mỗi pin / hiệu suất sạc. Hóa đơn = kWh × giá điện. Tiết kiệm = hóa đơn × tỷ lệ tiết kiệm.",
+        "incidents": "Sự cố mỗi năm = số pin × tần suất / 1.000. Ngăn chặn = sự cố × tỷ lệ ngăn chặn. Giá trị = ngăn chặn × (giá pin × tỷ lệ giá trị mất khi quá nhiệt + chi phí một xe chết giữa đường), cùng công thức với KPI ở màn Tổng quan.",
+        "net": "Lợi ích ròng = tiết kiệm thay pin + tiết kiệm điện + giá trị sự cố ngăn chặn − phí SaaS (số pin × phí × 12). Mức kéo dài hòa vốn là mức mà lợi ích ròng bằng 0, giữ nguyên các đại lượng khác.",
+        "payback": "Hoàn vốn (tháng) = chi phí triển khai (số pin × chi phí mỗi pin) / lợi ích ròng mỗi tháng. Không hoàn vốn nếu lợi ích ròng không dương."
+      },
+      "steps": {
+        "fadePerCycle": "Hao mòn dung lượng mỗi chu kỳ",
+        "cyclesToEol": "Số chu kỳ tới SOH 80%",
+        "daysToEol": "Tuổi thọ (ngày)",
+        "replacementsBefore": "Số pin thay mỗi năm, chưa có Voltify",
+        "lifeExtension": "Mức kéo dài tuổi thọ",
+        "daysWith": "Tuổi thọ có Voltify (ngày)",
+        "replacementsAfter": "Số pin thay mỗi năm, có Voltify",
+        "packCost": "Giá một pin",
+        "replacementSaving": "Tiết kiệm thay pin mỗi năm",
+        "temperature": "Nhiệt độ vận hành",
+        "cyclesPerDay": "Số chu kỳ mỗi ngày",
+        "daysAdded": "Số ngày tuổi thọ thêm được",
+        "energyKwh": "Điện năng sạc mỗi năm (kWh)",
+        "price": "Giá điện mỗi kWh",
+        "energyBill": "Hóa đơn điện mỗi năm",
+        "energySavingPct": "Tỷ lệ tiết kiệm điện",
+        "energySaving": "Tiết kiệm điện mỗi năm",
+        "incidentsBefore": "Sự cố mỗi năm, chưa có Voltify",
+        "preventionRate": "Tỷ lệ ngăn chặn",
+        "incidentsPrevented": "Sự cố ngăn chặn mỗi năm",
+        "costPerIncident": "Chi phí một sự cố (pin mất giá trị cộng xe chết giữa đường)",
+        "incidentSaving": "Giá trị sự cố ngăn chặn mỗi năm",
+        "totalBenefit": "Tổng tiết kiệm mỗi năm",
+        "saasFee": "Phí SaaS mỗi năm",
+        "netBenefit": "Lợi ích ròng mỗi năm",
+        "benefitPerFee": "Lợi ích trên mỗi đồng phí SaaS",
+        "breakEven": "Mức kéo dài tuổi thọ hòa vốn",
+        "onboarding": "Chi phí triển khai ban đầu",
+        "netPerMonth": "Lợi ích ròng mỗi tháng",
+        "paybackMonths": "Hoàn vốn (tháng)"
+      }
+    },
+    "chart": {
+      "title": "Cần kéo dài tuổi thọ bao nhiêu để hòa vốn?",
+      "intro": "Lợi ích ròng mỗi năm theo mức kéo dài tuổi thọ pin, các đại lượng khác giữ như trường hợp Thận trọng. Đường nét liền và nét chấm đánh dấu hai trường hợp của bạn.",
+      "axisX": "Kéo dài tuổi thọ pin (%)",
+      "axisY": "Lợi ích ròng mỗi năm (tỷ ₫)",
+      "series": "Lợi ích ròng",
+      "breakEven": "Hòa vốn {{pct}}%",
+      "verdict": "Với các giả định hiện tại, Voltify chỉ cần kéo dài tuổi thọ pin khoảng {{pct}}% là lợi ích bù đủ phí SaaS (các đại lượng khác như trường hợp Thận trọng).",
+      "noNeed": "Các lợi ích khác của trường hợp Thận trọng đã đủ bù phí SaaS, không cần kéo dài tuổi thọ.",
+      "impossible": "Với phí SaaS này, dù tuổi thọ kéo dài bao nhiêu cũng không bù đủ: phí lớn hơn tổng chi phí thay pin hiện tại."
+    },
+    "limits": {
+      "title": "Giới hạn đã biết",
+      "illustrative": "Giá pin, phí SaaS, giá điện, tần suất sự cố, chi phí triển khai là giả định minh họa để mô hình chạy được; cần thay bằng số liệu của khách hàng.",
+      "target": "Mục tiêu kéo dài tuổi thọ pin khoảng 35% và giảm chi phí điện năng khoảng 20% là mục tiêu cần xác nhận qua pilot, không phải kết quả đo.",
+      "measured": "Trường hợp Thận trọng chỉ dùng số đo từ mô phỏng: mức giảm nhiệt khi sạc ở tủ sạc nóng và tỷ lệ ngăn chặn trên một đội pin mô phỏng nhỏ. Tiết kiệm điện chưa đo được nên được tính bằng 0.",
+      "noPromise": "Đây là công cụ tính thử, không phải cam kết về doanh thu hay mức tiết kiệm."
+    }
+  },
+  "references": {
+    "title": "Tài liệu tham khảo",
+    "intro": "Ba nguồn của brief, kèm việc mỗi nguồn được dùng để làm gì và điều gì cố ý không lấy từ nguồn đó.",
+    "newTab": "(mở trong tab mới)",
+    "use": "Dùng để",
+    "caution": "Không lấy",
+    "items": {
+      "mdpi": {
+        "title": "MDPI: mô hình Digital Twin cho pin",
+        "source": "mdpi.com, bài báo khoa học",
+        "use": "Cơ sở khoa học cho việc ước lượng nội trở và tuổi thọ (SOH) bằng Digital Twin; chỉ dùng để minh chứng cho module SOH.",
+        "caution": "Con số độ chính xác nêu trong bài không được dùng như độ chính xác dự báo cháy nổ của Voltify: đó là một bài toán khác."
+      },
+      "ifactory": {
+        "title": "iFactory AI: quản lý rủi ro thermal runaway",
+        "source": "ifactoryapp.com, tài liệu của một nhà cung cấp",
+        "use": "Bối cảnh: dùng AI để cảnh báo sớm trước thermal runaway.",
+        "caution": "Tài liệu nói về cảnh báo sớm hàng giờ trong sản xuất pin. Voltify không mượn con số đó mà dùng lead time đo được từ mô phỏng (màn Evidence)."
+      },
+      "tuoitre": {
+        "title": "Tuổi Trẻ News: cuộc đua đầu tư trạm đổi pin ở Việt Nam",
+        "source": "news.tuoitre.vn, báo chí",
+        "use": "Bối cảnh thị trường: đầu tư vào trạm đổi pin tại Việt Nam đang nóng lên.",
+        "caution": "Đây là nguồn bối cảnh, không phải số liệu quy mô thị trường; TAM, SAM, SOM vẫn để placeholder cho tới khi có số liệu và nguồn xác thực."
+      }
+    }
+  },
+  "evidence": {
+    "banner": "Đây là kết quả trên dữ liệu mô phỏng (Simulated): rất nhiều pin ảo chạy ngay trong trình duyệt qua đúng đường ống thật (simulator, định dạng hãng, adapter, AI). Các seed 301 đến 306 chưa từng dùng để chỉnh ngưỡng của AI (đã chỉnh trên 201 đến 203). Không có số liệu nào ở đây được gõ tay. Ngoại lệ duy nhất, được gắn nhãn dữ liệu thật riêng, là phép thử SOH trên dữ liệu pin công khai của NASA.",
+    "running": "Đang chạy {{done}}/{{total}} nhóm mô phỏng trong Web Worker…",
+    "rules": {
+      "title": "Cách tính: ai là sự cố, ai là bình thường",
+      "intro": "Sự cố (event) là điều mô phỏng biết chắc đã xảy ra: pin bị đoản mạch ngầm, hoặc BMS truyền thống phải ngắt vì lõi chạm 65°C. AI được tính là phát hiện khi Risk Score từng đạt mức Cảnh báo (từ 50 điểm). Hai loại pin không rõ ràng được xử lý bằng hai lựa chọn dưới đây, và cả hai đều đổi được.",
+      "nearMiss": "Pin suýt chạm ngưỡng",
+      "nearMissOptions": {
+        "exclude": "Loại khỏi thống kê (mặc định)",
+        "event": "Tính là sự cố",
+        "normal": "Tính là bình thường"
+      },
+      "nearMissHint": "Lõi pin lên tới {{temp}}°C hoặc hơn nhưng BMS chưa ngắt, không có đoản mạch.",
+      "maintenance": "Đội pin có cell yếu",
+      "maintenanceOptions": {
+        "normal": "Tính là bình thường: cảnh báo là báo giả (mặc định)",
+        "exclude": "Loại khỏi thống kê"
+      },
+      "maintenanceHint": "Cell yếu là việc bảo trì chứ không phải nguy cơ cháy, nhưng module điện áp khó phân biệt nó với cell rò."
+    },
+    "headline": {
+      "recall": "Tỷ lệ phát hiện (Recall)",
+      "recallHint": "Trong các sự cố thật, AI cảnh báo được bao nhiêu.",
+      "precision": "Độ chính xác cảnh báo (Precision)",
+      "precisionHint": "Trong các pin AI cảnh báo, bao nhiêu thật sự là sự cố. Phụ thuộc vào tỷ lệ sự cố trong mẫu.",
+      "far": "Tỷ lệ báo động giả",
+      "farHint": "Trong các pin bình thường, bao nhiêu bị AI cảnh báo.",
+      "auc": "Diện tích dưới ROC",
+      "aucHint": "Xác suất AI cho điểm một sự cố cao hơn một pin bình thường. 1 là tách hoàn toàn, 0,5 là ngẫu nhiên.",
+      "lead": "Cảnh báo sớm (Lead time), trung bình",
+      "leadRange": "từ {{min}} đến {{max}} phút, trên {{n}} sự cố",
+      "leadHint": "Từ lúc AI cảnh báo đến lúc BMS truyền thống ngắt ở 65°C. Mục tiêu 30 đến 45 phút cần xác nhận qua pilot.",
+      "minutes": "{{value}} phút",
+      "interval": "Khoảng tin cậy 95%: {{lo}} đến {{hi}}",
+      "sample": "Mẫu tính: {{packs}} pin, trong đó {{events}} sự cố và {{normals}} pin bình thường (tỷ lệ sự cố {{prevalence}}%). Mọi tỷ lệ chỉ đúng với mẫu và cách tính này."
+    },
+    "confusion": {
+      "title": "Ma trận nhầm lẫn",
+      "intro": "Hàng là điều mô phỏng biết, cột là điều AI nói.",
+      "alerted": "AI cảnh báo",
+      "quiet": "AI im lặng",
+      "event": "Có sự cố",
+      "normal": "Bình thường",
+      "tp": "phát hiện đúng (TP)",
+      "fn": "bỏ sót (FN)",
+      "fp": "báo giả (FP)",
+      "tn": "im lặng đúng (TN)",
+      "excluded": "{{count}} pin bị loại khỏi ma trận theo cách tính đã chọn."
+    },
+    "roc": {
+      "title": "Đường ROC",
+      "intro": "Tỷ lệ phát hiện và tỷ lệ báo động giả khi ngưỡng Risk Score thay đổi. Ba điểm là các ngưỡng 25, 50 (mức Cảnh báo) và 75.",
+      "curve": "AI Voltify",
+      "chance": "Đoán ngẫu nhiên",
+      "thresholds": "Ngưỡng điểm",
+      "pointLabel": "từ {{threshold}} điểm",
+      "tooltip": "Ngưỡng {{threshold}}: phát hiện {{tpr}}, báo giả {{fpr}}",
+      "axisX": "Tỷ lệ báo động giả",
+      "axisY": "Tỷ lệ phát hiện"
+    },
+    "lead": {
+      "title": "Phân phối lead time",
+      "intro": "Số sự cố được cảnh báo trước khi BMS ngắt bao nhiêu phút. Vùng vàng là mục tiêu 30 đến 45 phút.",
+      "series": "Số sự cố",
+      "target": "Mục tiêu 30 đến 45 phút",
+      "tooltip": "{{from}} đến {{to}} phút: {{count}} sự cố",
+      "axisX": "Lead time (phút)",
+      "axisY": "Số sự cố",
+      "late": "{{count}} sự cố được cảnh báo sau khi BMS đã ngắt."
+    },
+    "groups": {
+      "title": "Kết quả theo từng loại ca",
+      "intro": "Mỗi dòng là một loại kịch bản. Cột sự cố là số pin mà mô phỏng biết có sự cố; cột cảnh báo là số pin AI cảnh báo (mọi pin, dù có sự cố hay không).",
+      "cols": {
+        "group": "Loại ca",
+        "packs": "Số pin",
+        "events": "Sự cố",
+        "near": "Suýt chạm",
+        "alerted": "AI cảnh báo",
+        "delay": "Phát hiện sau khi sự cố bắt đầu (trung vị)"
+      },
+      "ofEvents": "{{alerted}}/{{events}} sự cố",
+      "names": {
+        "baseline": "Ngày thường",
+        "heatwave43": "Nắng nóng 43°C",
+        "heavyClimb": "Chở nặng và leo dốc",
+        "agedHigh": "Pin chai cao",
+        "cellImbalance": "Cell mất cân bằng (bảo trì)",
+        "severeHeatLoad": "Quá tải trong nắng nóng (ca khó)",
+        "short_severe": "Đoản mạch ngầm: nặng",
+        "short_moderate": "Đoản mạch ngầm: vừa",
+        "short_mild": "Đoản mạch ngầm: nhẹ",
+        "short_veryMild": "Đoản mạch ngầm: rất nhẹ",
+        "shortNeighbour": "Pin lành cạnh pin bị đoản mạch"
+      },
+      "descs": {
+        "baseline": "Vận hành bình thường, không sự cố.",
+        "heatwave43": "Không khí nóng tới 43°C, tải bình thường.",
+        "heavyClimb": "Chở nặng, leo dốc liên tục, không sự cố bên trong pin.",
+        "agedHigh": "Pin đã chai nhiều, nội trở cao.",
+        "cellImbalance": "Mỗi pin có một cell yếu hơn các cell khác.",
+        "severeHeatLoad": "Pin chai, chở 100 kg, leo dốc, nắng gắt, pin kín trong cốp. Nhiều pin chạm 65°C.",
+        "short_severe": "Điện trở đoản mạch giảm nhanh và sâu.",
+        "short_moderate": "Điện trở đoản mạch giảm chậm hơn, ít sâu hơn.",
+        "short_mild": "Điện trở đoản mạch giảm chậm, nông.",
+        "short_veryMild": "Ở ngưỡng nhìn thấy được: tỏa nhiệt rất ít.",
+        "shortNeighbour": "Pin bình thường chạy cùng đội với pin bị đoản mạch."
+      }
+    },
+    "reasons": {
+      "baseline": "chưa có ca nào thuộc loại này trong mẫu.",
+      "heatwave43": "chưa có ca nào thuộc loại này trong mẫu.",
+      "agedHigh": "chưa có ca nào thuộc loại này trong mẫu.",
+      "heavyClimb": "tải rất nặng làm dòng vượt đường cong an toàn nên AI cảnh báo quá tải dù pin chưa gặp sự cố.",
+      "cellImbalance": "cell yếu làm điện áp lệch giống cell bị rò; module điện áp chưa phân biệt hoàn toàn. Là báo giả về cháy nổ nhưng đúng về nhu cầu bảo trì.",
+      "severeHeatLoad": "pin nóng nhưng chưa tới 60°C. AI cảnh báo vì nhiệt tăng và tải quá nặng; theo cách tính nghiêm ngặt vẫn là báo giả.",
+      "short_severe": "ca này không được cảnh báo.",
+      "short_moderate": "ca này không được cảnh báo.",
+      "short_mild": "ca này không được cảnh báo.",
+      "short_veryMild": "đoản mạch rất nhẹ tỏa quá ít nhiệt nên chưa vượt mức Cảnh báo trong cửa sổ mô phỏng.",
+      "shortNeighbour": "pin lành bị cảnh báo nhầm."
+    },
+    "cases": {
+      "cols": {
+        "group": "Loại ca",
+        "pack": "Pin",
+        "seed": "Seed",
+        "score": "Điểm cao nhất",
+        "temp": "Nhiệt đỉnh"
+      },
+      "open": "Xem trên Digital Twin",
+      "all": "Hiện cả {{count}} ca",
+      "fewer": "Thu gọn",
+      "missTitle": "Các ca AI bỏ sót",
+      "missIntro": "Sự cố thật mà AI chưa từng đạt mức Cảnh báo. Bấm vào một ca để xem lại đúng pin đó.",
+      "missEmpty": "Không có ca bỏ sót trong mẫu này. Điều đó không chứng minh rằng AI không bao giờ bỏ sót.",
+      "falseTitle": "Các ca AI báo sai",
+      "falseIntro": "Pin bình thường mà AI cảnh báo. Gộp theo nguyên nhân để thấy kiểu sai nào chiếm nhiều nhất.",
+      "falseEmpty": "Không có ca báo giả trong mẫu này."
+    },
+    "soh": {
+      "title": "Module SOH: ước lượng so với giá trị thật của mô phỏng",
+      "intro": "AI ước lượng độ chai (SOH) từ nội trở. Mỗi chấm là một pin của các đội không sự cố, sau 75 phút chạy; nằm trên đường nét đứt là ước lượng đúng.",
+      "cols": {
+        "n": "Số pin",
+        "mae": "Độ lớn sai số trung bình (điểm %)",
+        "bias": "Sai lệch TB (điểm %)",
+        "classes": "Xếp đúng loại tốt, vừa, yếu"
+      },
+      "note": "Hãng báo thưa hơn (B 10 giây, C 15 giây) mất lịch sử dòng điện giữa hai gói nên ước lượng kém hơn; đây là giới hạn của dữ liệu chứ không phải do tinh chỉnh.",
+      "ideal": "Ước lượng đúng",
+      "tooltip": "Thật {{truth}}, ước lượng {{est}}",
+      "axisX": "SOH thật của mô phỏng (%)",
+      "axisY": "SOH AI ước lượng (%)"
+    },
+    "real": {
+      "title": "Dữ liệu thật: NASA PCoE, pin Li-ion lão hóa",
+      "intro": "Bốn cell 18650 (B0005, B0006, B0007, B0018) được sạc xả lặp lại ở nhiệt độ phòng tới khi mất 30% dung lượng định mức 2 Ah, có đo trở kháng (Re + Rct) dọc đường. SOH thật là dung lượng đo được. Câu hỏi: quy luật của mô-đun SOH (điện trở / điện trở lúc mới = 1 + γ × (1 − SOH)) có đúng trên các cell thật này không?",
+      "cell": "Cell",
+      "chartAria": "SOH đo từ dung lượng và SOH ước lượng từ điện trở của cell {{cell}}",
+      "series": {
+        "measured": "SOH đo từ dung lượng (thật)",
+        "module": "Từ điện trở, γ = {{gamma}} (mô-đun)",
+        "others": "Từ điện trở, γ = {{gamma}} (từ 3 cell khác)"
+      },
+      "eol": "Hết vòng đời của thí nghiệm (1,4 Ah)",
+      "tooltip": "Chu kỳ xả {{cycle}}: SOH {{soh}}",
+      "axisX": "Chu kỳ xả",
+      "axisY": "SOH (% so với dung lượng ban đầu)",
+      "cols": {
+        "cell": "Cell",
+        "fade": "Mất dung lượng",
+        "ratio": "Điện trở cuối / ban đầu",
+        "gamma": "γ phù hợp riêng cell",
+        "module": "Sai số SOH với γ của mô-đun (điểm %)",
+        "others": "Sai số SOH với γ từ 3 cell khác (điểm %)",
+        "baseline": "Sai số nếu cứ coi pin còn mới (điểm %)"
+      },
+      "counts": "{{d}} lần xả, {{i}} lần đo trở kháng",
+      "colsNote": "Sai số là độ lớn trung bình của chênh lệch giữa SOH ước lượng và SOH thật trên các lần đo trở kháng của cell. Mô-đun dùng γ = {{gamma}}, một giả định của mô phỏng.",
+      "findingTitle": "Kết quả: giả định của mô phỏng không đúng trên các cell thật này",
+      "finding": "Điện trở của các cell thật tăng ít hơn nhiều so với giả định: γ phù hợp của từng cell chỉ từ {{gMin}} đến {{gMax}}, trong khi mô-đun dùng {{gamma}}. Vì vậy, với γ của mô-đun, SOH ước lượng lệch {{mMin}} đến {{mMax}} điểm %, hầu như không tốt hơn việc coi pin còn mới. Hiệu chỉnh γ trên 3 cell còn lại cũng chưa đủ: lệch {{oMin}} đến {{oMax}} điểm %.",
+      "consequence": "Hệ quả: quy luật điện trở sang SOH phải được hiệu chỉnh riêng cho từng loại pin bằng dữ liệu pilot, và nên đối chiếu với ước lượng dựa trên dung lượng. Các sai số nhỏ ở bảng mô phỏng phía trên chỉ có nghĩa trong mô phỏng.",
+      "scope": "Phạm vi: phép thử này kiểm tra quy luật điện trở sang SOH, không kiểm tra bộ ước lượng RLS trực tuyến (cần telemetry của pack với các bước dòng điện). Trở kháng ở đây đo bằng EIS, còn Voltify ước lượng từ telemetry; và cell 18650 nhỏ ở nhiệt độ phòng khác với pack xe máy điện.",
+      "source": "Nguồn dữ liệu:",
+      "link": "Kho dữ liệu của NASA"
+    },
+    "limits": {
+      "title": "Giới hạn đã biết",
+      "items": {
+        "simulated": "Trừ phép thử SOH trên dữ liệu thật của NASA, mọi kết quả ở đây là trên dữ liệu mô phỏng. AI được chỉnh trên cùng loại vật lý mà nó được đánh giá, nên khoảng cách giữa mô phỏng và thực tế (sim-to-real gap) là điều chưa biết lớn nhất; chỉ pilot với telemetry thật mới trả lời được.",
+        "event": "Sự cố ở đây là đoản mạch ngầm hoặc BMS ngắt ở 65°C, chứ không phải một vụ cháy thật; mô phỏng không tái hiện cháy nổ. Pin chạm từ {{temp}}°C mà BMS chưa ngắt được xử lý riêng và đổi được cách tính.",
+        "lead": "Lead time đo được thấp hơn mục tiêu 30 đến 45 phút. Dự báo thời gian còn lại tới 65°C trên màn hình trực tiếp thường lạc quan hơn thực tế; đó là dự báo, không phải cam kết.",
+        "short": "Hạ công suất 15% chỉ làm nhiệt tăng chậm lại khi nhiệt do tải; với đoản mạch ngầm, giá trị của Voltify là cảnh báo sớm và cô lập (đổi pin), không phải làm nhiệt ngừng tăng.",
+        "weakCell": "Cell yếu và cell rò cho tín hiệu điện áp tương tự, nên một phần đội pin cell yếu bị cảnh báo; đó là báo giả về cháy nổ nhưng hữu ích cho bảo trì.",
+        "slow": "Đoản mạch rất nhẹ (điện trở cuối {{ohm}} ohm, khoảng 9 W) tỏa quá ít nhiệt: trong cửa sổ mô phỏng 100 phút nhiều ca loại này bị bỏ sót.",
+        "soh": "Ước lượng SOH kém hơn với hãng báo dữ liệu thưa. Trên các cell thật của NASA, quy luật điện trở sang SOH của mô phỏng không đúng (xem phần dữ liệu thật ở trên), nên SOH của mô-đun chỉ đáng tin sau khi được hiệu chỉnh bằng dữ liệu thật.",
+        "prevalence": "Precision phụ thuộc vào tỷ lệ sự cố trong mẫu; đội pin ngoài thực tế có thể có tỷ lệ rất khác, nên con số này không được dùng để dự đoán precision ngoài thực tế."
+      }
+    },
+    "roadmap": {
+      "title": "Lộ trình",
+      "one": "Giai đoạn 1 (pilot): chỉ giám sát và cảnh báo trên telemetry thật, dùng để hiệu chỉnh ngưỡng và đo lead time, precision, recall thật.",
+      "two": "Giai đoạn 2: can thiệp điều khiển ngược về xe và tủ sạc (hạ công suất, hạ dòng sạc) sau khi giai đoạn 1 chứng minh cảnh báo đủ tin cậy.",
+      "three": "Mở rộng kiểm chứng SOH sang các tập dữ liệu công khai khác (ví dụ CALCE), các loại cell và pack khác, rồi tới dữ liệu pilot; hiệu chỉnh quy luật điện trở sang SOH theo từng loại pin."
+    }
+  },
+  "market": {
+    "uvp": {
+      "label": "Giá trị cốt lõi (UVP)",
+      "statement": "Voltify cảnh báo sớm rủi ro cháy nổ và kéo dài vòng đời pin cho xe máy điện thương mại, chỉ bằng phần mềm trên đám mây, cho mọi hãng pin trên một màn hình.",
+      "points": {
+        "proactive": {
+          "title": "Dự báo chủ động",
+          "body": "Cảnh báo sớm hàng chục phút (con số đo được ở màn Evidence) thay vì chờ BMS ngắt thụ động ở 65°C."
+        },
+        "saas": {
+          "title": "Thuần SaaS",
+          "body": "Tận dụng BMS và module GPS/4G đã có trong pin, không cần phần cứng mới."
+        },
+        "agnostic": {
+          "title": "Độc lập hãng",
+          "body": "Chuẩn hóa nhiều định dạng về một Digital Twin và một thang Risk Score, cho xe máy điện giao hàng và trạm đổi pin."
+        }
+      }
+    },
+    "problem": {
+      "title": "Vấn đề",
+      "intro": "Nắng nóng đô thị 40 đến 43°C (mặt đường tới khoảng 55°C) cộng với cường độ khai thác của shipper (10 đến 12 giờ mỗi ngày, dòng lớn liên tục) đẩy pin lithium-ion đến giới hạn.",
+      "items": {
+        "fire": "Cháy nổ đột ngột: BMS truyền thống chỉ ngắt thụ động khi đã chạm ngưỡng.",
+        "aging": "Chai pin ngầm nhanh hơn khoảng 30 đến 40% so với bình thường (theo brief); doanh nghiệp không giám sát được từng viên và phải thay pin sớm.",
+        "downtime": "Đứt gãy vận hành: xe chết giữa đường làm trễ đơn hàng."
+      }
+    },
+    "solution": {
+      "title": "Giải pháp",
+      "intro": "SaaS chạy hoàn toàn trên đám mây. Telemetry (khoảng 5 giây một lần) đi từ pin, qua máy chủ của hãng xe, rồi qua API sang Voltify.",
+      "items": {
+        "cloud": "Tận dụng BMS và module GPS/4G đã có sẵn trong pin: không thêm phần cứng.",
+        "twin": "Xây Digital Twin cho từng viên pin từ bốn chỉ số: điện áp từng cell, dòng sạc và xả, nhiệt độ bên trong và nội trở.",
+        "cross": "Chuẩn hóa nhiều hãng về một schema và một màn hình điều hành (Cross-brand Hub).",
+        "assets": "Tối ưu tài sản pin: xếp pin tốt đi đường dài, pin yếu đi chặng ngắn hoặc đưa đi bảo dưỡng."
+      }
+    },
+    "targets": {
+      "title": "Mục tiêu giá trị và số đo hiện có",
+      "intro": "Các mục tiêu của brief đặt cạnh những gì PoC đã đo được. Một mục tiêu chỉ trở thành kết quả khi pilot xác nhận.",
+      "cols": {
+        "what": "Chỉ tiêu",
+        "target": "Mục tiêu của brief",
+        "measured": "Đo được trong PoC",
+        "status": "Tình trạng"
+      },
+      "rows": {
+        "lead": "Cảnh báo sớm (Lead time)",
+        "life": "Kéo dài tuổi thọ pin",
+        "energy": "Giảm chi phí điện năng của trạm"
+      },
+      "leadTarget": "30 đến 45 phút",
+      "lifeTarget": "khoảng {{pct}}%",
+      "energyTarget": "khoảng {{pct}}%",
+      "leadMeasured": "ca khó của màn BMS vs Voltify, hãng A, B, C: {{a}}, {{b}} và {{c}} phút",
+      "lifeMeasured": "khoảng {{pct}}% (dự phóng từ sạc mát hơn ở tủ sạc nóng)",
+      "none": "chưa đo được",
+      "loading": "đang đo…",
+      "status": {
+        "met": "Đạt trong mô phỏng, cần pilot xác nhận",
+        "below": "Đã đo, thấp hơn mục tiêu",
+        "pilot": "Cần xác nhận qua pilot"
+      },
+      "note": "Lead time lấy từ ca khó nhất của màn BMS truyền thống vs Voltify; số trung bình trên nhiều ca nằm ở màn Evidence. Mức kéo dài tuổi thọ là dự phóng của mô hình Arrhenius với các giả định ở màn ROI."
+    },
+    "sizing": {
+      "title": "Quy mô thị trường (TAM, SAM, SOM)",
+      "intro": "Chưa có số liệu quy mô thị trường với nguồn xác thực nên ở đây chỉ ghi định nghĩa; các con số để placeholder cho tới khi có nguồn.",
+      "placeholder": "[điền số liệu + nguồn]",
+      "tam": {
+        "label": "TAM",
+        "name": "Toàn cầu",
+        "def": "Phần mềm quản trị pin thông minh và chẩn đoán từ xa cho xe điện toàn cầu."
+      },
+      "sam": {
+        "label": "SAM",
+        "name": "Đông Nam Á",
+        "def": "Xe hai bánh điện và trạm đổi pin tại các đô thị lớn Đông Nam Á (Việt Nam, Indonesia, Thái Lan, Philippines)."
+      },
+      "som": {
+        "label": "SOM",
+        "name": "1 đến 3 năm đầu, tại Việt Nam",
+        "def": "Phần thị trường có thể giành được tại Việt Nam trong 1 đến 3 năm đầu.",
+        "target": "Mục tiêu: giám sát {{packs}} pin thông minh sau 2 năm",
+        "value": "Đây là mục tiêu số lượng pin, không phải doanh thu hay quy mô thị trường."
+      }
+    },
+    "arr": {
+      "title": "Doanh thu thường niên, phép tính minh họa",
+      "formula": "{{packs}} pin × {{fee}} ₫ mỗi pin mỗi tháng × 12 tháng = {{total}} mỗi năm.",
+      "caveat": "Chỉ là phép tính minh họa: phí SaaS là giá trị mặc định của màn ROI (chưa chốt) và mục tiêu 50.000 pin còn phải được chứng minh. Đây không phải dự báo doanh thu.",
+      "link": "Chỉnh mức phí ở màn ROI"
+    },
+    "competitors": {
+      "title": "So sánh đối thủ",
+      "intro": "Ba nhóm đối thủ của brief. Chỉ điền những gì brief nêu; ô chưa có nguồn được để placeholder có chủ ý.",
+      "criterion": "Tiêu chí",
+      "placeholder": "[cần xác minh + nguồn]",
+      "columns": {
+        "voltify": {
+          "name": "Voltify",
+          "who": "SaaS độc lập hãng"
+        },
+        "oem": {
+          "name": "Hãng xe lớn",
+          "who": "Tesla, VinFast"
+        },
+        "deeptech": {
+          "name": "Startup deep-tech nước ngoài",
+          "who": "Electra Vehicles, Twaice"
+        },
+        "inhouse": {
+          "name": "Đội kỹ thuật nội bộ",
+          "who": "Hãng xe máy điện địa phương"
+        }
+      },
+      "rows": {
+        "vehicle": "Loại phương tiện mục tiêu",
+        "compat": "Tính tương thích phần cứng",
+        "charging": "Mô hình nạp năng lượng",
+        "ai": "Mức độ AI",
+        "model": "Mô hình sản phẩm",
+        "market": "Thị trường trọng điểm"
+      },
+      "cells": {
+        "voltify": {
+          "vehicle": "Xe máy điện giao hàng và trạm đổi pin",
+          "compat": "Độc lập hãng (agnostic)",
+          "charging": "Tối ưu cho đổi pin nhanh",
+          "ai": "Học máy chuyên sâu dự báo sốc nhiệt",
+          "model": "SaaS thuê bao theo pin",
+          "market": "Việt Nam và Đông Nam Á"
+        },
+        "oem": {
+          "vehicle": "Xe của chính hãng",
+          "compat": "Hệ sinh thái đóng, chỉ quản lý xe của mình",
+          "charging": "[cần xác minh + nguồn]",
+          "ai": "[cần xác minh + nguồn]",
+          "model": "[cần xác minh + nguồn]",
+          "market": "[cần xác minh + nguồn]"
+        },
+        "deeptech": {
+          "vehicle": "Ô tô điện, xe tải, hệ thống lưu trữ năng lượng",
+          "compat": "[cần xác minh + nguồn]",
+          "charging": "Bỏ trống xe hai bánh và trạm đổi pin ở Đông Nam Á",
+          "ai": "Công nghệ chuyên sâu (theo mô tả của brief)",
+          "model": "[cần xác minh + nguồn]",
+          "market": "Châu Âu và Mỹ"
+        },
+        "inhouse": {
+          "vehicle": "Xe máy điện của chính hãng",
+          "compat": "[cần xác minh + nguồn]",
+          "charging": "[cần xác minh + nguồn]",
+          "ai": "Mạnh phần cứng nhưng yếu data science; chi phí nuôi đội AI cao",
+          "model": "[cần xác minh + nguồn]",
+          "market": "Việt Nam"
+        }
+      },
+      "note": "Tên đối thủ là thông tin công khai; các ô còn placeholder là chưa có nguồn xác thực, không phải kết luận."
+    },
+    "advantage": {
+      "title": "Lợi thế khó sao chép (Unfair Advantage)",
+      "items": {
+        "engine": {
+          "title": "Cross-brand Digital Twin engine",
+          "body": "Một engine dùng chung cho nhiều hãng và nhiều định dạng; thêm một hãng mới chỉ cần thêm một adapter."
+        },
+        "data": {
+          "title": "Hàng rào dữ liệu tích lũy",
+          "body": "Càng nhiều pin chạy thực tế, mô hình càng học được nhiều kịch bản sốc nhiệt."
+        }
+      },
+      "caveat": "Lợi thế về dữ liệu chỉ có thật khi có pilot và dữ liệu thật; PoC này mới chứng minh được kiến trúc."
+    },
+    "revenue": {
+      "title": "Mô hình doanh thu",
+      "intro": "Thuê bao SaaS theo pin.",
+      "items": {
+        "subscription": "Phí thuê bao theo từng pin mỗi tháng; mức phí chưa chốt (xem màn ROI để thử các mức).",
+        "customers": "Khách hàng: hãng logistics chặng cuối, hãng xe, mạng lưới trạm đổi pin.",
+        "noHardware": "Không bán phần cứng mới: tận dụng BMS và module GPS/4G có sẵn."
+      }
+    },
+    "roadmap": {
+      "title": "Lộ trình",
+      "stage": "Giai đoạn {{n}}",
+      "note": "Lộ trình theo giai đoạn, chưa gắn mốc thời gian vì phụ thuộc kết quả của pilot.",
+      "items": {
+        "poc": {
+          "title": "PoC mô phỏng",
+          "body": "Bản demo này: mô phỏng có cơ sở vật lý, AI giải thích được, kiểm chứng trên dữ liệu mô phỏng."
+        },
+        "pilot": {
+          "title": "Pilot giám sát và cảnh báo",
+          "body": "Chạy trên telemetry thật của một khách hàng, chỉ cảnh báo, chưa điều khiển; đo lead time, precision và recall thật."
+        },
+        "control": {
+          "title": "Can thiệp điều khiển ngược",
+          "body": "Hạ công suất xả và hạ dòng sạc qua BMS và tủ sạc, sau khi có thỏa thuận với hãng xe."
+        },
+        "scale": {
+          "title": "Mở rộng đa hãng",
+          "body": "Mục tiêu giám sát 50.000 pin sau 2 năm tại Việt Nam, rồi tới Đông Nam Á."
+        }
+      }
+    },
+    "impact": {
+      "title": "Ý nghĩa xã hội và môi trường",
+      "items": {
+        "trust": {
+          "title": "Bớt nỗi lo cháy nổ và chai pin",
+          "body": "Đây là hai rào cản khi người dùng chuyển sang xe điện."
+        },
+        "fire": {
+          "title": "Ngăn phát thải từ hỏa hoạn",
+          "body": "Cảnh báo sớm giúp tránh những vụ cháy và phát thải đi kèm."
+        },
+        "waste": {
+          "title": "Ít rác thải kim loại nặng",
+          "body": "Kéo dài tuổi thọ pin làm giảm số pin phải loại bỏ."
+        },
+        "grid": {
+          "title": "Giảm áp lực lên lưới điện",
+          "body": "Sạc thông minh vào giờ thấp điểm."
+        }
+      },
+      "caveat": "Đây là hướng tác động kỳ vọng, chưa được đo trong PoC."
+    }
+  },
+  "sandbox": {
+    "controls": {
+      "title": "Tự dựng kịch bản",
+      "intro": "Kéo các thanh trượt hoặc chọn một kịch bản có sẵn; mô phỏng chạy lại sau khi bạn dừng kéo. Bên trái là BMS truyền thống, bên phải là Voltify, cùng seed nên giống hệt nhau cho tới khi Voltify ra lệnh đầu tiên.",
+      "reset": "Về ngày thường"
+    },
+    "presets": {
+      "label": "Kịch bản có sẵn",
+      "items": {
+        "ordinary": "Ngày thường",
+        "heatwave43": "Nắng nóng 43°C",
+        "heavyClimb": "Chở nặng + leo dốc",
+        "weakCell": "Cell mất cân bằng",
+        "internalShort": "Đoản mạch ngầm",
+        "aged": "Pin chai cao",
+        "worst": "Ca khó (quá tải + nắng gắt)"
+      }
+    },
+    "groups": {
+      "weather": "Thời tiết và làm mát",
+      "load": "Tải và đường",
+      "pack": "Pin",
+      "fault": "Tiêm lỗi"
+    },
+    "fields": {
+      "ambientPeakC": "Nhiệt độ cao nhất trong ngày",
+      "coolingScale": "Khả năng tản nhiệt của pin",
+      "startWarmC": "Pin nóng hơn môi trường lúc bắt đầu",
+      "payloadKg": "Tải trên xe (người và hàng)",
+      "climbGradePct": "Độ dốc khi leo",
+      "climbDutyPct": "Tỷ lệ thời gian leo dốc",
+      "speedScale": "Nhịp chạy",
+      "sohPct": "Độ chai ban đầu (SOH)",
+      "brand": "Hãng pin",
+      "weakCell": "Một cell yếu hơn các cell khác",
+      "shortOn": "Tiêm đoản mạch ngầm vào pin",
+      "onsetMin": "Đoản mạch bắt đầu ở phút",
+      "severity": "Mức độ đoản mạch",
+      "intervention": "Can thiệp của Voltify",
+      "duration": "Thời gian mô phỏng",
+      "seed": "Seed ngẫu nhiên"
+    },
+    "hints": {
+      "ambientPeakC": "Nhiệt độ không khí cao nhất của ngày; lúc bắt đầu là giữa trưa.",
+      "coolingScale": "1 là bình thường; 0,25 là pin kín trong cốp xe phơi nắng.",
+      "startWarmC": "Pin vừa rời tủ sạc nóng thường nóng hơn môi trường vài độ.",
+      "payloadKg": "Chở nặng làm dòng điện lớn hơn nên sinh nhiệt nhiều hơn.",
+      "climbDutyPct": "Phần thời gian chạy trên dốc.",
+      "sohPct": "Pin càng chai thì nội trở càng cao, sinh nhiệt càng nhiều.",
+      "weakCell": "Dung lượng cell thấp hơn 18% và nội trở gấp 1,7 lần.",
+      "shortOn": "Hạ công suất không làm nhiệt do đoản mạch ngừng tăng; giá trị của Voltify ở đây là cảnh báo sớm và đổi pin.",
+      "seed": "Cùng seed và cùng các thanh trượt thì cho đúng cùng kết quả."
+    },
+    "units": {
+      "min": "phút"
+    },
+    "severities": {
+      "severe": "Nặng",
+      "moderate": "Vừa",
+      "mild": "Nhẹ"
+    },
+    "durationOption": "{{minutes}} phút",
+    "running": "Đang chạy mô phỏng trong Web Worker…",
+    "notes": {
+      "title": "Cần biết khi dùng Sandbox",
+      "same": "Hai bên dùng cùng seed và cùng kịch bản; mọi khác biệt là do lệnh của Voltify (hạ công suất, đổi pin), không phải do ngẫu nhiên.",
+      "short": "Với đoản mạch ngầm, nhiệt sinh ra từ chính chỗ chập nên hạ công suất chỉ làm chậm lại; đổi pin mới cắt được tải. Đoản mạch nhẹ có thể không bị phát hiện trong thời gian ngắn (xem màn Evidence).",
+      "limits": "Đây là mô phỏng với tham số giả định, không phải dự đoán cho một chiếc xe cụ thể."
+    }
+  },
+  "story": {
+    "intro": {
+      "title": "Demo tự động {{minutes}} phút",
+      "body": "Đi qua bốn màn: Tổng quan đội pin, BMS truyền thống vs Voltify, Cơ chế can thiệp và ROI, mỗi màn kèm chú thích. Mọi con số trong chú thích lấy từ chính mô phỏng. Bấm Esc hoặc Thoát để dừng bất cứ lúc nào.",
+      "start": "Bắt đầu demo",
+      "sandbox": "Hoặc tự thử ở Sandbox",
+      "repeatable": "Demo lặp lại được: đội pin dùng seed 2026 và ca BMS vs Voltify dùng seed 202, nên mỗi lần chạy cho cùng một câu chuyện. Giữa chừng bạn có thể tạm dừng, nhảy sang bước khác, hoặc tự bấm vào các màn (demo sẽ dừng lại chờ bạn).",
+      "stepsTitle": "Bốn bước",
+      "startHere": "Bắt đầu từ bước này"
+    },
+    "steps": {
+      "screen": "Màn {{n}}",
+      "fleet": {
+        "name": "Tổng quan đội pin",
+        "what": "Bản đồ 300 pin theo mức rủi ro, KPI truy ngược được."
+      },
+      "bms": {
+        "name": "BMS truyền thống vs Voltify",
+        "what": "Cùng một ngày tệ, hai kết cục: BMS ngắt ở 65°C, Voltify cảnh báo sớm."
+      },
+      "intervention": {
+        "name": "Cơ chế can thiệp",
+        "what": "Điện thoại shipper, nhật ký lệnh và việc đổi pin."
+      },
+      "roi": {
+        "name": "ROI và Impact",
+        "what": "Lợi ích ròng, hoàn vốn và mức kéo dài tuổi thọ cần để hòa vốn."
+      }
+    },
+    "beats": {
+      "fleet": {
+        "b1": "Đây là đội 300 pin mô phỏng ở TP.HCM và Hà Nội, mỗi điểm là một pin. Hình dạng và màu cho biết mức rủi ro: An toàn, Theo dõi, Cảnh báo, Nguy hiểm.",
+        "b2": "Voltify theo dõi từng pin liên tục. Pin có Risk Score cao nhất vừa được chọn: bên phải là các thông số và trạng thái của nó.",
+        "b3": "Mọi con số ở đây đều truy ngược được: bấm vào KPI Sự cố ngăn chặn để xem công thức và đội đối chứng không có can thiệp."
+      },
+      "bms": {
+        "b1": "Cùng một ngày nắng 43°C, pin chai, chở nặng, leo dốc. Hai bên giống hệt nhau; chỉ khác là bên phải có Voltify.",
+        "b2": "Voltify cảnh báo lúc {{alert}} và hạ công suất {{derate}}%. BMS truyền thống chưa làm gì vì lõi pin chưa chạm 65°C.",
+        "b3": "BMS ngắt lúc {{trip}} khi lõi chạm 65°C: xe chết giữa đường. Voltify đã cảnh báo trước {{lead}} phút và nhiệt đỉnh chỉ {{peak}}°C, so với {{bmsPeak}}°C ở BMS truyền thống."
+      },
+      "intervention": {
+        "b1": "Khi Risk Score đạt mức Cảnh báo, nền tảng gửi lệnh hạ công suất {{derate}}% xuống xe và báo cho shipper.",
+        "b2": "Điện thoại shipper nhận thông báo: đổi pin tại trạm {{station}}, cách {{distance}} m, đã giữ sẵn một pin mát. Bản đồ là đường thẳng mà mô phỏng giả định.",
+        "b3": "Pin được đổi xong lúc {{swap}}; pin nóng nằm lại trạm để làm mát. Nhật ký lệnh là ví dụ định dạng mô phỏng. Giai đoạn 1 chỉ cảnh báo; lệnh xuống xe là giai đoạn 2."
+      },
+      "roi": {
+        "b1": "Máy tính ROI: số pin, giá pin, nhiệt độ vận hành, chu kỳ mỗi ngày và phí SaaS đều chỉnh được. Mặc định ({{packs}} pin, phí {{fee}} ₫ mỗi pin mỗi tháng) chỉ là giả định minh họa.",
+        "b2": "Trường hợp Thận trọng chỉ dùng số đo từ mô phỏng: lợi ích ròng khoảng {{careful}} mỗi năm, hoàn vốn sau {{payback}} tháng. Chỉ cần pin bền hơn khoảng {{breakEven}}% là bù đủ phí SaaS.",
+        "b3": "Trường hợp Mục tiêu (tuổi thọ +35%, điện năng −20%) cho khoảng {{target}} mỗi năm, nhưng đó là mục tiêu cần pilot xác nhận, không phải kết quả đo."
+      }
+    },
+    "panel": {
+      "aria": "Hướng dẫn demo",
+      "step": "Bước {{current}}/{{total}}",
+      "steps": "Các bước của demo",
+      "progress": "Tiến độ demo",
+      "time": "{{elapsed}} / {{total}}",
+      "prev": "Trước",
+      "next": "Sau",
+      "pause": "Tạm dừng",
+      "resume": "Tiếp tục",
+      "exit": "Thoát",
+      "replay": "Xem lại từ đầu"
+    },
+    "end": {
+      "title": "Hết demo",
+      "body": "Bạn vừa đi qua đội pin, ca BMS truyền thống vs Voltify, cơ chế can thiệp và ROI. Phần chứng minh và giới hạn nằm ở các màn dưới đây.",
+      "limits": {
+        "simulated": "Mọi dữ liệu là mô phỏng; chưa có dữ liệu pin thật.",
+        "targets": "Mục tiêu lead time 30 đến 45 phút, tuổi thọ +35% và điện năng −20% cần pilot xác nhận; số đo được hiện thấp hơn hoặc chưa có.",
+        "phases": "Giai đoạn 1 chỉ giám sát và cảnh báo; can thiệp điều khiển ngược là giai đoạn 2."
+      },
+      "evidence": "Xem màn Evidence",
+      "sandbox": "Thử ở Sandbox",
+      "market": "Thị trường và Kinh doanh"
     }
   }
 }

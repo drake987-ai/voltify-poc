@@ -4,14 +4,32 @@
     {
       "name": "voltify-dev",
       "runtimeExecutable": "C:\\Program Files\\nodejs\\node.exe",
-      "runtimeArgs": ["node_modules/vite/bin/vite.js"],
+      "runtimeArgs": [
+        "node_modules/vite/bin/vite.js"
+      ],
       "port": 5173
     },
     {
       "name": "voltify-preview",
       "runtimeExecutable": "C:\\Program Files\\nodejs\\node.exe",
-      "runtimeArgs": ["node_modules/vite/bin/vite.js", "preview"],
+      "runtimeArgs": [
+        "node_modules/vite/bin/vite.js",
+        "preview"
+      ],
       "port": 4173
+    },
+    {
+      "name": "voltify-offline",
+      "runtimeExecutable": "C:\\Program Files\\nodejs\\node.exe",
+      "runtimeArgs": [
+        "node_modules/vite/bin/vite.js",
+        "preview",
+        "--outDir",
+        "dist-offline",
+        "--port",
+        "4174"
+      ],
+      "port": 4174
     }
   ]
 }

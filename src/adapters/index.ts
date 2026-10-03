@@ -32,3 +32,4 @@ export function normalize(raw: unknown): Result<Telemetry, AdapterError> {
       return fail('unknown_format', 'payload matches none of the known vendor formats');
   }
 }
+export * from './fieldMap';

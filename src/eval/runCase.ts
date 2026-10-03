@@ -3,7 +3,7 @@
 // knows. It is the only code that looks at both sides, so it lives apart from
 // src/ai (which must never see ground truth). The Evidence screen reuses it.
 import { normalize, type Brand } from '../adapters';
-import { createEngine, ingest, type Assessment } from '../ai';
+import { createEngine, ingest, type Assessment, type SohClass } from '../ai';
 import { RISK_RANK, type RiskLevel } from '../lib/riskLevels';
 import {
   SIM,
@@ -61,6 +61,12 @@ export interface BatteryOutcome {
   bmsTripS: number | null;
   maxScore: number;
   maxCoreTempC: number;
+  /** SOH the AI estimated for this pack at the end of the run (null while it was still learning it). */
+  sohEstFinal: number | null;
+  /** The routing class the AI gave it (good / fair / weak) at the end of the run. */
+  sohClassFinal: SohClass | null;
+  /** The simulator's true SOH at the end of the run (validation only). */
+  sohTrueFinal: number;
 }
 
 export interface CaseResult {
@@ -95,6 +101,9 @@ function outcomeOf(id: string, brand: Brand): BatteryOutcome {
     bmsTripS: null,
     maxScore: 0,
     maxCoreTempC: -Infinity,
+    sohEstFinal: null,
+    sohClassFinal: null,
+    sohTrueFinal: Number.NaN,
   };
 }
 
@@ -140,6 +149,8 @@ export function runCase(spec: CaseSpec): CaseResult {
       const c = a.risk.contributions;
       if (rank >= alertRank && c.thermal + c.voltage >= c.overload + c.health) o.firstSafetyAlertS ??= tS;
       o.maxScore = Math.max(o.maxScore, a.risk.score);
+      o.sohEstFinal = a.learning ? null : a.impedance.sohEst;
+      o.sohClassFinal = a.learning ? null : a.impedance.class;
       if (spec.trace && a.batteryId === targetId) {
         trace.push({
           tS,
@@ -160,6 +171,7 @@ export function runCase(spec: CaseSpec): CaseResult {
       const o = outcomes.get(b.config.id)!;
       const t = truthOf(b);
       o.maxCoreTempC = Math.max(o.maxCoreTempC, t.coreTempC);
+      o.sohTrueFinal = t.soh;
       if (t.bmsTrippedAtS !== null) o.bmsTripS ??= t.bmsTrippedAtS;
       if (t.faultOnsetS !== null) {
         o.hasFault = true;

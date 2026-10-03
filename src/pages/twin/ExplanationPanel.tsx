@@ -1,10 +1,11 @@
+import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 import { explainAssessment, type Assessment, type RecommendedAction } from '@/ai';
 import { Card } from '@/components/ui/Card';
 import { formatNumber } from '@/lib/format';
 import { MODULE_COLORS } from './moduleStyle';
 
-function actionText(t: ReturnType<typeof useTranslation>['t'], a: RecommendedAction): string {
+function actionText(t: TFunction, a: RecommendedAction): string {
   const percent = Math.round((a.value ?? 0) * 100);
   switch (a.code) {
     case 'monitor':
@@ -48,7 +49,7 @@ export function ExplanationPanel({ assessment }: { assessment: Assessment | null
                   {t(`twin.signals.${e.signal}.name`)}
                   {e.cell !== undefined ? <span className="ml-2 font-normal text-muted">({t('twin.charts.cellName', { n: e.cell + 1 })})</span> : null}
                 </p>
-                <p className="shrink-0 text-sm font-semibold">{t('twin.risk.points', { points: e.points.toFixed(1) })}</p>
+                <p className="shrink-0 text-sm font-semibold">{t('twin.risk.points', { points: formatNumber(e.points, lang, 1) })}</p>
               </div>
               <p className="mt-1 text-xs leading-snug text-muted">{t(`twin.signals.${e.signal}.hint`)}</p>
               <p className="mt-2 text-xs text-text">

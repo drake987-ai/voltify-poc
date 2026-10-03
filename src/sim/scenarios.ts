@@ -5,7 +5,7 @@
 // Scenarios are deliberately orthogonal: e.g. `internalShort` changes nothing
 // but the fault, so a run with it and a run without it are identical until the
 // fault starts (the basis of the A/B comparison on screen 3).
-import type { LoadProfile } from './battery';
+import type { LoadProfile, Mode } from './battery';
 import { FAULT } from './params';
 
 export const SCENARIO_IDS = [
@@ -18,6 +18,7 @@ export const SCENARIO_IDS = [
   'overheatLoad',
   'escalatingShort',
   'severeHeatLoad',
+  'hotCabinet',
 ] as const;
 export type ScenarioId = (typeof SCENARIO_IDS)[number];
 
@@ -35,17 +36,26 @@ export interface ScenarioSpec {
   coreTempAboveAmbientC?: number;
   /** Multiplier on the pack's heat conductance hA: below 1 = poor cooling (sealed compartment in the sun). */
   coolingScale?: number;
+  /** What the pack is doing when the run starts (default: riding). */
+  startMode?: Mode;
   /** One cell group with lower capacity and higher resistance. */
   weakCell?: { capScale: number; r0Scale: number; cell?: number };
   /** Internal soft short; `onsetS` is seconds after the battery starts. */
   fault?: { cell?: number; onsetS: number; rShortOhm0: number; rShortMinOhm: number; tauS: number };
 }
 
-/** One scenario, or several composed (later ones win field by field; `load` merges key by key). */
-export type ScenarioSelection = ScenarioId | readonly ScenarioId[];
+/**
+ * One scenario, or several composed (later ones win field by field; `load` merges key by key), or a
+ * scenario written out in full (the Sandbox builds these from its sliders).
+ */
+export type ScenarioSelection = ScenarioId | readonly ScenarioId[] | ScenarioSpec;
 
 export function resolveScenario(selection: ScenarioSelection): ScenarioSpec {
-  const ids: readonly ScenarioId[] = typeof selection === 'string' ? [selection] : selection;
+  if (typeof selection === 'object' && !Array.isArray(selection)) {
+    const spec = selection as ScenarioSpec;
+    return { ...spec, ...(spec.load ? { load: { ...spec.load } } : {}) };
+  }
+  const ids: readonly ScenarioId[] = typeof selection === 'string' ? [selection] : (selection as readonly ScenarioId[]);
   const out: ScenarioSpec = { id: ids.join('+') };
   for (const id of ids) {
     const s = SCENARIOS[id];
@@ -55,6 +65,7 @@ export function resolveScenario(selection: ScenarioSelection): ScenarioSpec {
     if (s.socRange) out.socRange = s.socRange;
     if (s.coreTempAboveAmbientC !== undefined) out.coreTempAboveAmbientC = s.coreTempAboveAmbientC;
     if (s.coolingScale !== undefined) out.coolingScale = s.coolingScale;
+    if (s.startMode !== undefined) out.startMode = s.startMode;
     if (s.weakCell) out.weakCell = s.weakCell;
     if (s.fault) out.fault = s.fault;
   }
@@ -124,5 +135,20 @@ export const SCENARIOS: Record<ScenarioId, ScenarioSpec> = {
     socRange: [0.92, 0.98],
     coreTempAboveAmbientC: 8,
     coolingScale: 0.25,
+  },
+  /**
+   * An aged pack put on fast charge (1 C) in a crowded swap cabinet on a hot afternoon: the
+   * cabinet air is 46-50 degC and the stacked pack sheds heat poorly (hA x0.5). Used by the
+   * charging-cabinet screen to compare full-rate charging with a current reduced by the AI.
+   */
+  hotCabinet: {
+    id: 'hotCabinet',
+    env: { ambientMinC: 46, ambientMaxC: 50 },
+    load: { chargeCRate: 1.0 },
+    soh: 0.78,
+    socRange: [0.1, 0.12],
+    coreTempAboveAmbientC: 4,
+    coolingScale: 0.5,
+    startMode: 'charging',
   },
 };

@@ -1,13 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-export const PLAYBACK_SPEEDS = [1, 10, 60] as const;
-export type PlaybackSpeed = (typeof PLAYBACK_SPEEDS)[number];
+export const PLAYBACK_SPEEDS: readonly number[] = [1, 10, 60];
+export type PlaybackSpeed = number;
 
 export interface Playback {
   /** Simulated seconds shown so far. */
   tS: number;
   playing: boolean;
   speed: PlaybackSpeed;
+  /** The speeds offered to the viewer (multiples of real time). */
+  speeds: readonly PlaybackSpeed[];
   atEnd: boolean;
   setSpeed: (s: PlaybackSpeed) => void;
   toggle: () => void;
@@ -18,11 +20,14 @@ export interface Playback {
 }
 
 /**
- * Plays back a precomputed simulation at 1x, 10x or 60x of real time. The state is
+ * Plays back a precomputed simulation at a few multiples of real time (1x, 10x, 60x unless told otherwise). The state is
  * published at about 20 Hz, which is smooth enough for charts without re-rendering
  * them every frame.
  */
-export function usePlayback(durationS: number, options: { autoplay?: boolean; speed?: PlaybackSpeed } = {}): Playback {
+export function usePlayback(
+  durationS: number,
+  options: { autoplay?: boolean; speed?: PlaybackSpeed; speeds?: readonly PlaybackSpeed[] } = {},
+): Playback {
   const [tS, setT] = useState(0);
   const [playing, setPlaying] = useState(options.autoplay ?? false);
   const [speed, setSpeed] = useState<PlaybackSpeed>(options.speed ?? 60);
@@ -67,6 +72,7 @@ export function usePlayback(durationS: number, options: { autoplay?: boolean; sp
     tS,
     playing,
     speed,
+    speeds: options.speeds ?? PLAYBACK_SPEEDS,
     atEnd,
     setSpeed,
     toggle: () => {

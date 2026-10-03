@@ -28,6 +28,11 @@ export interface FleetOptions {
   overrides?: Readonly<Record<string, ScenarioSelection>>;
   /** Local clock hour at which the simulation starts (default 12). */
   startLocalHour?: number;
+  /**
+   * Create only these batteries (by id). A battery evolves identically whatever else is in the
+   * fleet, so this reproduces one battery of a large fleet without simulating the rest.
+   */
+  only?: readonly string[];
 }
 
 export interface FleetState {
@@ -55,14 +60,21 @@ export interface FleetStep {
   frames: RawFrame[];
 }
 
-function pickBrand(seed: number, index: number, mix: readonly [number, number, number]): Brand {
+export const DEFAULT_BRAND_MIX: readonly [number, number, number] = [0.4, 0.35, 0.25];
+
+export function pickBrand(seed: number, index: number, mix: readonly [number, number, number] = DEFAULT_BRAND_MIX): Brand {
   const total = mix[0] + mix[1] + mix[2];
   const u = uniformFromKey(seed, `brand:${index}`) * total;
   return u < mix[0] ? 'A' : u < mix[0] + mix[1] ? 'B' : 'C';
 }
 
+/** Id of the battery at `index` in a fleet of this seed and brand mix, e.g. "A-0012". */
+export function batteryIdAt(seed: number, index: number, mix: readonly [number, number, number] = DEFAULT_BRAND_MIX): string {
+  return `${pickBrand(seed, index, mix)}-${String(index + 1).padStart(4, '0')}`;
+}
+
 export function createFleet(options: FleetOptions): FleetState {
-  const { seed, n, city = 'hcmc', brandMix = [0.4, 0.35, 0.25], scenario = 'baseline', overrides = {} } = options;
+  const { seed, n, city = 'hcmc', brandMix = DEFAULT_BRAND_MIX, scenario = 'baseline', overrides = {} } = options;
   const base = resolveScenario(scenario);
   const env: Environment = { ...(base.env ?? BASE_ENV), offsetC: 0 };
   const startTS = ((options.startLocalHour ?? SIM.startLocalHour) - SIM.startLocalHour) * 3600;
@@ -74,6 +86,7 @@ export function createFleet(options: FleetOptions): FleetState {
     const brand = pickBrand(seed, index, brandMix);
     const batteryCity: City = city === 'both' ? (uniformFromKey(seed, `city:${index}`) < 0.5 ? 'hcmc' : 'hanoi') : city;
     const id = `${brand}-${String(index + 1).padStart(4, '0')}`;
+    if (options.only && !options.only.includes(id)) continue;
     const override = overrides[id];
     const spec = override ? resolveScenario(override) : base;
     batteries.push(createBattery({ seed, index, brand, city: batteryCity, env, scenario: spec, startTS }));
@@ -82,10 +95,12 @@ export function createFleet(options: FleetOptions): FleetState {
 }
 
 export function findBattery(fleet: FleetState, batteryId: string): BatteryState | undefined {
-  // Ids are `${brand}-${index + 1}`, so the index is recoverable directly.
+  // Ids are `${brand}-${index + 1}`, so in a full fleet the index is recoverable directly.
   const index = Number.parseInt(batteryId.slice(2), 10) - 1;
   const b = fleet.batteries[index];
-  return b !== undefined && b.config.id === batteryId ? b : undefined;
+  if (b !== undefined && b.config.id === batteryId) return b;
+  // A partial fleet (`only`) is not indexed by serial number.
+  return fleet.options.only ? fleet.batteries.find((x) => x.config.id === batteryId) : undefined;
 }
 
 /** Inject an internal short into one battery of a running fleet. Returns false if the id is unknown. */

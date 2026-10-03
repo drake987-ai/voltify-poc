@@ -83,3 +83,18 @@ body {
   scrollbar-width: thin;
   scrollbar-color: var(--c-border) transparent;
 }
+
+/* Leaflet needs its tile images at their natural size; Tailwind's preflight would shrink them. */
+.leaflet-container img.leaflet-tile {
+  max-width: none !important;
+  max-height: none !important;
+}
+
+/* Dark map: invert the OpenStreetMap tiles instead of fetching a separate dark style. */
+[data-theme='dark'] .fleet-map .leaflet-tile-pane {
+  filter: invert(1) hue-rotate(180deg) brightness(0.8) contrast(0.9) saturate(0.55);
+}
+
+.fleet-map.leaflet-container {
+  font-family: inherit;
+}
