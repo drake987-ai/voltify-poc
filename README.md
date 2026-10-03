@@ -1,5 +1,7 @@
 # Voltify PoC Sandbox
 
+**Bản chạy thử trực tuyến:** https://drake987-ai.github.io/voltify-poc/ (mã nguồn: https://github.com/drake987-ai/voltify-poc)
+
 Web demo tương tác của **Voltify**: nền tảng SaaS dùng AI dự đoán rủi ro cháy nổ và tối ưu vòng đời pin cho xe máy điện thương mại (shipper, logistics chặng cuối, mạng lưới trạm đổi pin) tại Việt Nam.
 
 > *English, in one line:* a frontend-only proof of concept (no backend, runs offline after the build) that simulates battery fleets with physics-based models, runs a real explainable AI engine on the simulated telemetry in the browser, and reports its accuracy honestly, including where it fails. Every screen is available in Vietnamese and English.
@@ -130,7 +132,7 @@ Thiết lập một lần:
 3. (Tùy chọn) **Settings > Secrets and variables > Actions > Variables**: thêm `VITE_TILE_URL` nếu có máy chủ gạch bản đồ riêng (xem mục offline). Để trống thì bản đồ dùng OpenStreetMap.
 4. Push, hoặc vào tab **Actions** và chạy workflow thủ công. Địa chỉ trang hiện ở job `Deploy` và trong Settings > Pages, dạng `https://<user>.github.io/<repo>/`.
 
-Các action được ghim theo phiên bản chính (`checkout@v7`, `setup-node@v7`, `configure-pages@v6`, `upload-pages-artifact@v5`, `deploy-pages@v5`) và dùng Node 24. Workflow này chưa chạy trên GitHub (repository chưa có remote); các bước `npm ci`, `npm test`, `npm run build` đã được chạy thử trên một bản checkout sạch ở máy.
+Các action được ghim theo phiên bản chính (`checkout@v7`, `setup-node@v7`, `configure-pages@v6`, `upload-pages-artifact@v5`, `deploy-pages@v5`) và dùng Node 24. Workflow đã chạy thành công trên GitHub (lần chạy đầu thất bại vì một test chạm giới hạn thời gian mặc định 5 giây trên runner chậm; đã nâng giới hạn trong `vite.config.ts`).
 
 ### Chạy offline
 
