@@ -1,0 +1,366 @@
+{
+  "app": {
+    "name": "Voltify",
+    "tagline": "AI platform for fire-risk prediction and battery lifecycle optimisation"
+  },
+  "header": {
+    "language": "Language",
+    "theme": "Appearance",
+    "themeToDark": "Switch to dark mode",
+    "themeToLight": "Switch to light mode",
+    "toggleSidebar": "Collapse or expand the navigation sidebar",
+    "skipToContent": "Skip to main content"
+  },
+  "nav": {
+    "label": "Main navigation",
+    "groups": {
+      "demo": "Demo",
+      "platform": "Platform",
+      "business": "Business and Evidence"
+    },
+    "items": {
+      "story": "Story Mode",
+      "sandbox": "Sandbox Mode",
+      "fleet": "Overview (Fleet)",
+      "twin": "Digital Twin",
+      "bms": "BMS vs Voltify",
+      "vitals": "Four vital signs",
+      "intervention": "Intervention",
+      "crossBrand": "Cross-brand Hub",
+      "roi": "ROI and Impact",
+      "evidence": "Evidence",
+      "market": "Market and Business"
+    }
+  },
+  "dataSource": {
+    "simulated": "Simulated data",
+    "real": "Real data: {{dataset}}",
+    "reference": "Reference content",
+    "simulatedHint": "Every figure on this screen is produced by the physics simulator running in your browser, not by real vehicles.",
+    "realHint": "Figures on this screen come from the named public dataset.",
+    "referenceHint": "Business and reference content, not measured data. Figures without a verified source are clearly marked."
+  },
+  "risk": {
+    "legend": "Risk level",
+    "safe": "Safe",
+    "watch": "Watch",
+    "warning": "Warning",
+    "danger": "Danger"
+  },
+  "footer": {
+    "pocNotice": "This PoC runs entirely in the browser with no backend. Figures are simulated unless a screen says it uses real data."
+  },
+  "common": {
+    "comingInStage": "This screen is built in stage {{stage}}.",
+    "notFoundTitle": "Page not found",
+    "notFoundBody": "This path does not exist in the demo.",
+    "backToFleet": "Back to Overview"
+  },
+  "state": {
+    "loadingPage": "Loading the screen…",
+    "loading": "Running the simulation in a Web Worker…",
+    "error": "The simulation could not run: {{message}}"
+  },
+  "brands": {
+    "A": "Brand A (Selex-like)",
+    "B": "Brand B (Dat Bike-like)",
+    "C": "Brand C (VinFast-like)"
+  },
+  "playback": {
+    "play": "Play",
+    "pause": "Pause",
+    "replay": "Replay",
+    "toEnd": "Skip to end",
+    "speed": "Playback speed",
+    "scrub": "Drag to scrub simulated time"
+  },
+  "ab": {
+    "controls": {
+      "scenario": "Scenario",
+      "brand": "Pack type",
+      "intervention": "Voltify intervention"
+    },
+    "scenarios": {
+      "severeHeatLoad": {
+        "name": "Overload in the heat (worst day)",
+        "desc": "Aged pack (SOH 70%), 100 kg of cargo, 8% climbs, 43°C sun, pack sealed in the bike's compartment. No fault inside the pack: the heat comes from the load, so cutting the load truly stops the temperature rising."
+      },
+      "heatwave43": {
+        "name": "Ordinary hot day (control)",
+        "desc": "43°C sun, normal load. Used to check Voltify raises no false alarm: both sides must be identical."
+      }
+    },
+    "interventions": {
+      "full": "Cut power 15%, then swap the pack",
+      "derateOnly": "Cut power 15% only, no swap"
+    },
+    "panels": {
+      "bms": {
+        "title": "Traditional BMS",
+        "subtitle": "Passively cuts off only once the pack has reached 65°C"
+      },
+      "voltify": {
+        "title": "Voltify",
+        "subtitle": "Early warning, power cut, shipper told to swap the pack"
+      }
+    },
+    "chart": {
+      "aria": "Chart of pack core temperature over time: {{panel}}",
+      "axisTime": "Simulated time (minutes)",
+      "temperature": "Pack core temperature (°C)",
+      "measured": "Measured (telemetry)",
+      "expected": "What the AI expects of a healthy pack (Digital Twin)",
+      "limit": "BMS cut-off threshold: 65°C"
+    },
+    "marks": {
+      "ai_alert": "Voltify alert",
+      "alert_and_cut": "Alert + power cut",
+      "derate_sent": "Power cut",
+      "shipper_notified": "Shipper told",
+      "swap_done": "Pack swapped",
+      "bms_trip": "BMS cut-off",
+      "vehicle_stopped": "Bike stopped on the road"
+    },
+    "status": {
+      "running": "Running normally",
+      "tripped": "BMS has cut the power",
+      "stranded": "Bike stopped on the road",
+      "watching": "Monitoring",
+      "derating": "Power cut {{percent}}% in effect",
+      "swapped": "Pack swapped, left at the station"
+    },
+    "events": {
+      "title": "What happened",
+      "empty": "Nothing has happened yet.",
+      "worldBms": "BMS",
+      "worldVoltify": "Voltify",
+      "ai_alert": "Voltify alert: Risk Score reached the Warning level",
+      "derate_sent": "Command sent to the bike: cut discharge power {{percent}}%",
+      "shipper_notified": "Shipper told to swap at station {{station}}, {{distance}} m away, with a cool pack reserved",
+      "shipper_notified_nostation": "Shipper told to swap at the nearest station",
+      "swap_done": "Pack swapped at the station; the overheated pack stays behind, no load",
+      "bms_trip": "BMS cut the power because the core reached 65°C",
+      "vehicle_stopped": "The bike died on the road and the shipper is stranded"
+    },
+    "kpi": {
+      "alert": "Voltify alert at",
+      "alertHint": "First time the Risk Score reached the Warning level (50 points)",
+      "bmsTrip": "BMS cut-off at",
+      "bmsTripHint": "When the core temperature reaches 65°C",
+      "lead": "Early warning (Lead time)",
+      "leadHint": "From Voltify's alert to the BMS cut-off, measured in this simulation",
+      "leadValue": "{{minutes}} min",
+      "peak": "Peak temperature: BMS | Voltify",
+      "peakHint": "Highest core temperature reached so far",
+      "noTrip": "No cut-off",
+      "notYet": "Not yet",
+      "none": "None"
+    },
+    "eta": {
+      "label": "AI forecast to the 65°C limit",
+      "none": "No crossing forecast",
+      "value": "in {{minutes}} min"
+    },
+    "verdict": {
+      "title": "Result of this run",
+      "running": "Playing the simulation…",
+      "protected": "Voltify warned {{lead}} minutes before the BMS. After the intervention the temperature stopped rising at a peak of {{peak}}°C and then fell; the pack never reached 65°C. With the traditional BMS the pack reached {{bmsPeak}}°C and the bike stopped on the road.",
+      "control": "Ordinary hot day: Voltify raised no alert and took no action, and both sides are identical (no false alarm).",
+      "stillTrips": "Cutting power 15% alone slowed the temperature rise but the pack still reached 65°C and the BMS cut off ({{delay}} minutes later than with no intervention). Swapping the pack is the decisive step.",
+      "holdsWithoutSwap": "Cutting power alone kept the pack below 65°C in this run (peak {{peak}}°C), but it stays hot because it has not been swapped."
+    },
+    "notes": {
+      "title": "Read the result with care",
+      "severe": "This is a deliberately severe scenario (a worst day), not a typical situation. Results over many scenarios and random seeds are in the Evidence tab.",
+      "lead": "Lead time here is the number measured in this simulation. The 30–45 minute figure is a target to be confirmed in a pilot on real vehicles, not a conclusion of this PoC.",
+      "derate": "A 15% power cut slows the temperature rise; it is the swap (removing the load) that stops it. For heat from inside the pack (an internal short) cutting load cannot stop the heat: then Voltify's value is early warning and isolating the pack.",
+      "assumptions": "Swap time is computed from the distance to the nearest station with a cool pack (assumptions: shipper reacts in 30 s, rides at 6 m/s, 90 s to hand over). The simulation does not include the secondary exothermic reactions of lithium-ion cells (real thermal runaway)."
+    }
+  },
+  "twin": {
+    "controls": {
+      "case": "Situation"
+    },
+    "cases": {
+      "healthy": {
+        "name": "Healthy pack, ordinary day",
+        "desc": "Control: a normal pack on an ordinary day. The Risk Score must stay at Safe."
+      },
+      "overload": {
+        "name": "Overload in the heat",
+        "desc": "The hero scenario of the BMS vs Voltify screen, but here only observed (no intervention) so you can follow the AI's reasoning step by step."
+      },
+      "shortCircuit": {
+        "name": "An internal short developing",
+        "desc": "From minute 20 one cell starts to leak charge and gets steadily worse. The AI sees the cell drifting and heat that cannot be explained."
+      },
+      "weakCell": {
+        "name": "Weak cell (imbalance)",
+        "desc": "One cell has lost 18% of its capacity and has 1.7 times the resistance. This is a maintenance matter, not an immediate fire risk."
+      },
+      "aged": {
+        "name": "Heavily aged pack",
+        "desc": "SOH around 72% with high internal resistance. The AI estimates ageing from resistance and classifies the pack for routing."
+      }
+    },
+    "units": {
+      "min": "min"
+    },
+    "heading": "Digital Twin of battery #{{id}}",
+    "meta": "{{brand}}, reports every {{interval}} seconds",
+    "risk": {
+      "title": "Risk Score",
+      "scoreOf": "points out of 100",
+      "why": "Why this score?",
+      "empty": "No signal worth noting.",
+      "learning": "The AI is still learning this pack (the first few minutes), so it only uses directly measured quantities.",
+      "points": "{{points}} points",
+      "confidence": "confidence {{percent}}%",
+      "range": "starts counting at {{threshold}} {{unit}}, maximum at {{limit}} {{unit}}"
+    },
+    "modules": {
+      "thermal": "Thermal trend",
+      "voltage": "Voltage anomaly",
+      "overload": "Overload",
+      "health": "Ageing (Impedance / SOH)"
+    },
+    "signals": {
+      "unexplained_heat": {
+        "name": "Heat the standard model cannot explain",
+        "hint": "Excess heat power over what the current and weather account for. A rising value is an early sign of an internal short or poor cooling."
+      },
+      "eta_to_limit": {
+        "name": "Forecast time to the 65°C limit",
+        "hint": "Extrapolated from the present heating trend; the shorter, the more dangerous. A forecast, not a promise."
+      },
+      "core_temp": {
+        "name": "Pack core temperature",
+        "hint": "Measured directly; risk starts counting from 52°C."
+      },
+      "cell_sag": {
+        "name": "A cell sagging below the group",
+        "hint": "How far the lowest cell sits below the median, with the current-dependent part removed, expressed as an equivalent % SOC. A leaking or badly unbalanced cell is off at every current."
+      },
+      "cell_drift": {
+        "name": "A cell drifting away from the group",
+        "hint": "A cell that has changed relative to the group over the last ~25 minutes, which catches an internal short while the offset is still small."
+      },
+      "weak_cell": {
+        "name": "Weak cell (higher resistance than its neighbours)",
+        "hint": "A maintenance finding rather than a fire signal, so its weight is capped."
+      },
+      "cell_voltage_limit": {
+        "name": "Cell voltage outside its limits",
+        "hint": "A cell below 2.8 V or above 4.3 V."
+      },
+      "overload_crate": {
+        "name": "Current beyond the safe curve for the temperature",
+        "hint": "RMS current over the continuous current allowed at the present temperature; above 1 is an overload."
+      },
+      "hot_charge": {
+        "name": "Charging while the pack is hot",
+        "hint": "Charging with the core above 45°C ages the pack faster and adds risk."
+      },
+      "low_soh": {
+        "name": "Heavily aged (low SOH)",
+        "hint": "SOH estimated from internal resistance. A weak pack heats more easily, but on its own it is not a fire risk."
+      }
+    },
+    "readout": {
+      "coreTemp": "Core temperature",
+      "current": "Current (discharge +)",
+      "packVoltage": "Pack voltage",
+      "soc": "Charge level (SOC)",
+      "r25": "Resistance (at 25°C)",
+      "soh": "Battery ageing (SOH)",
+      "eta": "Forecast to 65°C",
+      "heat": "Unexplained heat",
+      "etaNone": "None",
+      "learning": "learning",
+      "sohClass": {
+        "good": "Good: long routes first",
+        "fair": "Fair: medium trips",
+        "weak": "Weak: short trips or service"
+      }
+    },
+    "charts": {
+      "aria": "Chart: {{title}}",
+      "axisTime": "Simulated time (minutes)",
+      "temperature": "Core temperature: actual vs AI prediction",
+      "measured": "Actual (measured)",
+      "filtered": "AI filtered (Digital Twin)",
+      "nominal": "What the AI expects of a healthy pack",
+      "trueTemp": "Simulation ground truth",
+      "heat": "Unexplained heat (W)",
+      "estimatedHeat": "AI estimate",
+      "trueHeat": "True fault heat in the simulation",
+      "cells": "Per-cell voltage: deviation from the median (mV)",
+      "cellsNow": "The 16 cells right now (mV from the median)",
+      "cellName": "Cell {{n}}",
+      "risk": "Risk Score over time, by module contribution",
+      "soh": "Ageing (SOH): AI estimate vs simulation truth",
+      "sohEstimated": "AI estimate",
+      "sohTrue": "Simulation truth",
+      "current": "Current (A)"
+    },
+    "truth": {
+      "toggle": "Show the simulation's true values",
+      "hint": "Only available in simulation, to check the AI. A real system does not have these values."
+    },
+    "actions": {
+      "title": "AI recommendations",
+      "monitor": "Keep monitoring",
+      "derate": "Cut discharge power {{percent}}%",
+      "swap": "Swap to a cool pack at the nearest station",
+      "isolate": "Isolate this pack after the swap",
+      "reduce_charge": "Reduce charging current to {{percent}}%",
+      "schedule_maintenance": "Schedule service or move to short trips"
+    }
+  },
+  "pages": {
+    "story": {
+      "title": "Story Mode",
+      "subtitle": "A guided 3-minute demo that walks through Overview, BMS vs Voltify, Intervention and ROI with step-by-step captions."
+    },
+    "sandbox": {
+      "title": "Sandbox Mode",
+      "subtitle": "Change the ambient temperature and load yourself, or inject a fault into any battery and watch how Voltify reacts."
+    },
+    "fleet": {
+      "title": "Overview (Fleet Command Center)",
+      "subtitle": "Battery map by risk level, fleet KPIs and a live alert feed."
+    },
+    "twin": {
+      "title": "Battery Digital Twin",
+      "subtitle": "Per-cell voltage, core temperature, current, internal resistance, actual vs AI-predicted curves, and why the Risk Score has its value."
+    },
+    "bms": {
+      "title": "Traditional BMS vs Voltify",
+      "subtitle": "Same scenario, same seed: the BMS only cuts off at 65°C, while Voltify warns early (lead time) and intervenes."
+    },
+    "vitals": {
+      "title": "Four vital signs",
+      "subtitle": "State of Charge (SOC), State of Health (SOH), safety and fire risk, discharge performance, each with a plain-language explanation."
+    },
+    "intervention": {
+      "title": "Intervention mechanism",
+      "subtitle": "Shipper notification, charging cabinet current reduction and the command log sent down to the vehicle."
+    },
+    "crossBrand": {
+      "title": "Cross-brand Hub",
+      "subtitle": "Three raw feeds in three formats, passed through the adapter and shown on one unified screen."
+    },
+    "roi": {
+      "title": "ROI and Impact Calculator",
+      "subtitle": "Battery replacement savings, extended lifetime and payback period, with editable formulas and assumptions."
+    },
+    "evidence": {
+      "title": "Evidence / Validation",
+      "subtitle": "Precision, Recall, false alarm rate and lead time computed from simulation, plus Known limits and Roadmap."
+    },
+    "market": {
+      "title": "Market and Business",
+      "subtitle": "TAM/SAM/SOM, competitor comparison, UVP, Unfair Advantage, revenue model and roadmap."
+    }
+  }
+}

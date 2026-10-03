@@ -1,0 +1,85 @@
+@import 'tailwindcss';
+@import '@fontsource-variable/inter/wght.css';
+
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+/* ------------------------------------------------------------------ */
+/* Design tokens. Dark is the default; light overrides below.          */
+/* Risk colours are always paired with an icon + label in the UI       */
+/* (see RiskBadge) so they never carry meaning on their own.           */
+/* ------------------------------------------------------------------ */
+:root,
+[data-theme='dark'] {
+  color-scheme: dark;
+  --c-bg: #0a110f;
+  --c-surface: #101a17;
+  --c-surface-2: #16231f;
+  --c-border: #23352e;
+  --c-text: #e7f2ed;
+  --c-muted: #9db3a9;
+  --c-accent: #2dd4a7;
+  --c-accent-fg: #04130e;
+  --c-risk-safe: #34d399;
+  --c-risk-watch: #facc15;
+  --c-risk-warning: #fb923c;
+  --c-risk-danger: #f87171;
+}
+
+[data-theme='light'] {
+  color-scheme: light;
+  --c-bg: #f3f8f5;
+  --c-surface: #ffffff;
+  --c-surface-2: #e9f1ed;
+  --c-border: #cddbd4;
+  --c-text: #0f201a;
+  --c-muted: #4a6158;
+  --c-accent: #0f766e;
+  --c-accent-fg: #ffffff;
+  --c-risk-safe: #047857;
+  --c-risk-watch: #8a6100;
+  --c-risk-warning: #c2410c;
+  --c-risk-danger: #b91c1c;
+}
+
+@theme inline {
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, 'Segoe UI', Roboto, sans-serif;
+  --color-bg: var(--c-bg);
+  --color-surface: var(--c-surface);
+  --color-surface-2: var(--c-surface-2);
+  --color-border: var(--c-border);
+  --color-text: var(--c-text);
+  --color-muted: var(--c-muted);
+  --color-accent: var(--c-accent);
+  --color-accent-fg: var(--c-accent-fg);
+  --color-risk-safe: var(--c-risk-safe);
+  --color-risk-watch: var(--c-risk-watch);
+  --color-risk-warning: var(--c-risk-warning);
+  --color-risk-danger: var(--c-risk-danger);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--c-bg);
+  color: var(--c-text);
+  font-family: var(--font-sans);
+  /* Numbers line up in tables and live-updating readouts. */
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 2px solid var(--c-accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--c-border) transparent;
+}

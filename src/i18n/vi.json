@@ -1,0 +1,366 @@
+{
+  "app": {
+    "name": "Voltify",
+    "tagline": "Nền tảng AI dự đoán rủi ro cháy nổ và tối ưu vòng đời pin"
+  },
+  "header": {
+    "language": "Ngôn ngữ",
+    "theme": "Giao diện",
+    "themeToDark": "Chuyển sang chế độ tối",
+    "themeToLight": "Chuyển sang chế độ sáng",
+    "toggleSidebar": "Thu gọn hoặc mở rộng thanh điều hướng",
+    "skipToContent": "Chuyển tới nội dung chính"
+  },
+  "nav": {
+    "label": "Điều hướng chính",
+    "groups": {
+      "demo": "Demo",
+      "platform": "Nền tảng",
+      "business": "Kinh doanh và Bằng chứng"
+    },
+    "items": {
+      "story": "Story Mode",
+      "sandbox": "Sandbox Mode",
+      "fleet": "Tổng quan (Fleet)",
+      "twin": "Bản sao số (Digital Twin)",
+      "bms": "BMS vs Voltify",
+      "vitals": "Bốn chỉ số sinh hiệu",
+      "intervention": "Cơ chế can thiệp",
+      "crossBrand": "Cross-brand Hub",
+      "roi": "ROI và Impact",
+      "evidence": "Evidence",
+      "market": "Thị trường và Kinh doanh"
+    }
+  },
+  "dataSource": {
+    "simulated": "Dữ liệu mô phỏng (Simulated)",
+    "real": "Dữ liệu thật (Real): {{dataset}}",
+    "reference": "Nội dung tham khảo (Reference)",
+    "simulatedHint": "Toàn bộ số liệu trên màn hình này do trình mô phỏng vật lý chạy trong trình duyệt tạo ra, không phải dữ liệu từ xe thật.",
+    "realHint": "Số liệu trên màn hình này lấy từ bộ dữ liệu công khai được nêu tên.",
+    "referenceHint": "Nội dung kinh doanh và tài liệu tham khảo, không phải dữ liệu đo. Số liệu chưa có nguồn xác thực được đánh dấu rõ."
+  },
+  "risk": {
+    "legend": "Mức rủi ro",
+    "safe": "An toàn",
+    "watch": "Theo dõi",
+    "warning": "Cảnh báo",
+    "danger": "Nguy hiểm"
+  },
+  "footer": {
+    "pocNotice": "PoC chạy hoàn toàn trên trình duyệt, không có backend. Số liệu là mô phỏng trừ khi màn hình ghi rõ dữ liệu thật."
+  },
+  "common": {
+    "comingInStage": "Màn hình này sẽ được triển khai ở giai đoạn {{stage}}.",
+    "notFoundTitle": "Không tìm thấy trang",
+    "notFoundBody": "Đường dẫn này không tồn tại trong bản demo.",
+    "backToFleet": "Về trang Tổng quan"
+  },
+  "state": {
+    "loadingPage": "Đang tải màn hình…",
+    "loading": "Đang chạy mô phỏng trong Web Worker…",
+    "error": "Không chạy được mô phỏng: {{message}}"
+  },
+  "brands": {
+    "A": "Hãng A (Selex-like)",
+    "B": "Hãng B (Dat Bike-like)",
+    "C": "Hãng C (VinFast-like)"
+  },
+  "playback": {
+    "play": "Phát",
+    "pause": "Tạm dừng",
+    "replay": "Phát lại",
+    "toEnd": "Tới cuối",
+    "speed": "Tốc độ phát",
+    "scrub": "Kéo để tua thời gian mô phỏng"
+  },
+  "ab": {
+    "controls": {
+      "scenario": "Kịch bản",
+      "brand": "Loại pin",
+      "intervention": "Can thiệp của Voltify"
+    },
+    "scenarios": {
+      "severeHeatLoad": {
+        "name": "Quá tải trong nắng nóng (ngày tệ nhất)",
+        "desc": "Pin chai (SOH 70%), chở 100 kg, leo dốc 8%, nắng 43°C, pin kín trong cốp xe. Không có lỗi bên trong pin: nhiệt sinh ra do tải, nên giảm tải thật sự làm nhiệt ngừng tăng."
+      },
+      "heatwave43": {
+        "name": "Ngày nắng nóng bình thường (đối chứng)",
+        "desc": "Nắng 43°C, tải bình thường. Dùng để kiểm tra Voltify không báo động giả: hai bên phải giống hệt nhau."
+      }
+    },
+    "interventions": {
+      "full": "Hạ công suất 15% rồi đổi pin",
+      "derateOnly": "Chỉ hạ công suất 15%, không đổi pin"
+    },
+    "panels": {
+      "bms": {
+        "title": "BMS truyền thống",
+        "subtitle": "Chỉ ngắt thụ động khi pin đã chạm 65°C"
+      },
+      "voltify": {
+        "title": "Voltify",
+        "subtitle": "Cảnh báo sớm, hạ công suất, báo shipper đổi pin"
+      }
+    },
+    "chart": {
+      "aria": "Biểu đồ nhiệt độ lõi pin theo thời gian: {{panel}}",
+      "axisTime": "Thời gian mô phỏng (phút)",
+      "temperature": "Nhiệt độ lõi pin (°C)",
+      "measured": "Đo được (telemetry)",
+      "expected": "AI kỳ vọng nếu pin khỏe (Digital Twin)",
+      "limit": "Ngưỡng ngắt của BMS: 65°C"
+    },
+    "marks": {
+      "ai_alert": "Voltify cảnh báo",
+      "alert_and_cut": "Cảnh báo + hạ công suất",
+      "derate_sent": "Hạ công suất",
+      "shipper_notified": "Báo shipper",
+      "swap_done": "Đổi pin",
+      "bms_trip": "BMS ngắt",
+      "vehicle_stopped": "Xe dừng giữa đường"
+    },
+    "status": {
+      "running": "Đang chạy bình thường",
+      "tripped": "BMS đã ngắt nguồn",
+      "stranded": "Xe dừng giữa đường",
+      "watching": "Đang giám sát",
+      "derating": "Đang hạ công suất {{percent}}%",
+      "swapped": "Đã đổi pin, pin nằm lại trạm"
+    },
+    "events": {
+      "title": "Diễn biến",
+      "empty": "Chưa có sự kiện nào.",
+      "worldBms": "BMS",
+      "worldVoltify": "Voltify",
+      "ai_alert": "Voltify cảnh báo: Risk Score đạt mức Cảnh báo",
+      "derate_sent": "Gửi lệnh xuống xe: hạ công suất xả {{percent}}%",
+      "shipper_notified": "Báo shipper đổi pin tại trạm {{station}}, cách {{distance}} m, đã giữ sẵn một pin mát",
+      "shipper_notified_nostation": "Báo shipper đổi pin tại trạm gần nhất",
+      "swap_done": "Đã đổi pin tại trạm; pin quá nóng nằm lại, không còn tải",
+      "bms_trip": "BMS ngắt nguồn vì lõi pin chạm 65°C",
+      "vehicle_stopped": "Xe chết máy giữa đường, shipper bị kẹt"
+    },
+    "kpi": {
+      "alert": "Voltify cảnh báo lúc",
+      "alertHint": "Lần đầu Risk Score đạt mức Cảnh báo (từ 50 điểm)",
+      "bmsTrip": "BMS ngắt lúc",
+      "bmsTripHint": "Khi nhiệt lõi chạm 65°C",
+      "lead": "Cảnh báo sớm (Lead time)",
+      "leadHint": "Từ lúc Voltify cảnh báo đến lúc BMS ngắt, đo từ mô phỏng này",
+      "leadValue": "{{minutes}} phút",
+      "peak": "Nhiệt đỉnh: BMS | Voltify",
+      "peakHint": "Nhiệt lõi cao nhất đã đạt tới thời điểm này",
+      "noTrip": "Không ngắt",
+      "notYet": "Chưa xảy ra",
+      "none": "Không có"
+    },
+    "eta": {
+      "label": "Dự báo AI tới ngưỡng 65°C",
+      "none": "Chưa dự báo chạm ngưỡng",
+      "value": "sau {{minutes}} phút"
+    },
+    "verdict": {
+      "title": "Kết quả của lần chạy này",
+      "running": "Đang phát mô phỏng…",
+      "protected": "Voltify cảnh báo sớm hơn BMS {{lead}} phút. Sau khi can thiệp, nhiệt độ ngừng tăng ở đỉnh {{peak}}°C rồi giảm, pin không chạm 65°C. Với BMS truyền thống, pin chạm {{bmsPeak}}°C và xe dừng giữa đường.",
+      "control": "Ngày nắng nóng bình thường: Voltify không cảnh báo và không can thiệp, hai bên giống hệt nhau (không báo động giả).",
+      "stillTrips": "Chỉ hạ công suất 15% làm chậm đà tăng nhiệt nhưng pin vẫn chạm 65°C và bị BMS ngắt (chậm hơn {{delay}} phút so với không can thiệp). Việc đổi pin mới là bước quyết định.",
+      "holdsWithoutSwap": "Chỉ hạ công suất đã giữ được pin dưới 65°C ở lần chạy này (đỉnh {{peak}}°C), nhưng pin vẫn nóng vì chưa được đổi."
+    },
+    "notes": {
+      "title": "Cần lưu ý khi đọc kết quả",
+      "severe": "Đây là kịch bản khắc nghiệt có chủ đích (ngày tệ nhất), không phải tình huống thường gặp. Kết quả trên nhiều kịch bản và nhiều seed ngẫu nhiên nằm ở tab Evidence.",
+      "lead": "Lead time ở đây là số đo được từ mô phỏng này. Mục tiêu 30–45 phút là mục tiêu cần xác nhận qua pilot trên xe thật, không phải kết luận của PoC.",
+      "derate": "Hạ công suất 15% làm chậm đà tăng nhiệt; chính việc đổi pin (dừng tải) mới làm nhiệt ngừng tăng. Với nguồn nhiệt bên trong pin (đoản mạch ngầm), giảm tải không dừng được nhiệt: lúc đó giá trị của Voltify là cảnh báo sớm và cách ly pin.",
+      "assumptions": "Thời gian đổi pin tính từ khoảng cách tới trạm gần nhất còn pin mát (giả định: shipper phản ứng 30 s, chạy 6 m/s, thao tác đổi 90 s). Mô phỏng không gồm các phản ứng tỏa nhiệt thứ cấp của pin lithium-ion (thermal runaway thật)."
+    }
+  },
+  "twin": {
+    "controls": {
+      "case": "Tình huống"
+    },
+    "cases": {
+      "healthy": {
+        "name": "Pin khỏe, ngày thường",
+        "desc": "Đối chứng: pin bình thường chạy ngày thường. Risk Score phải ở mức An toàn."
+      },
+      "overload": {
+        "name": "Quá tải trong nắng nóng",
+        "desc": "Cùng kịch bản chủ lực của màn BMS vs Voltify, nhưng ở đây chỉ quan sát (không can thiệp) để xem AI suy luận từng bước."
+      },
+      "shortCircuit": {
+        "name": "Đoản mạch ngầm đang hình thành",
+        "desc": "Từ phút 20 một cell bắt đầu rò điện và ngày càng nặng. AI thấy cell lệch dần và nhiệt tỏa ra không giải thích được."
+      },
+      "weakCell": {
+        "name": "Cell yếu (mất cân bằng)",
+        "desc": "Một cell mất 18% dung lượng và có nội trở cao hơn 1,7 lần. Đây là việc bảo trì, không phải nguy cơ cháy tức thời."
+      },
+      "aged": {
+        "name": "Pin chai cao",
+        "desc": "SOH khoảng 72%, nội trở cao. AI ước lượng độ chai từ nội trở và phân loại để điều chuyển pin."
+      }
+    },
+    "units": {
+      "min": "phút"
+    },
+    "heading": "Bản sao số (Digital Twin) của pin #{{id}}",
+    "meta": "{{brand}}, gửi dữ liệu {{interval}} giây một lần",
+    "risk": {
+      "title": "Risk Score",
+      "scoreOf": "điểm trên 100",
+      "why": "Vì sao có số điểm này?",
+      "empty": "Chưa có tín hiệu nào đáng kể.",
+      "learning": "AI đang học đặc trưng của pin này (vài phút đầu) nên chỉ dùng các đại lượng đo trực tiếp.",
+      "points": "{{points}} điểm",
+      "confidence": "tin cậy {{percent}}%",
+      "range": "bắt đầu tính từ {{threshold}} {{unit}}, tối đa tại {{limit}} {{unit}}"
+    },
+    "modules": {
+      "thermal": "Xu hướng nhiệt (Thermal trend)",
+      "voltage": "Điện áp cell (Voltage anomaly)",
+      "overload": "Quá tải (Overload)",
+      "health": "Độ chai (Impedance / SOH)"
+    },
+    "signals": {
+      "unexplained_heat": {
+        "name": "Nhiệt tỏa ra mà mô hình chuẩn không giải thích được",
+        "hint": "Công suất nhiệt dư so với nhiệt dự kiến từ dòng điện và thời tiết. Tăng dần là dấu hiệu sớm của đoản mạch ngầm hoặc làm mát kém."
+      },
+      "eta_to_limit": {
+        "name": "Thời gian dự báo tới ngưỡng 65°C",
+        "hint": "Ngoại suy từ xu hướng nhiệt hiện tại; càng ngắn càng nguy hiểm. Đây là dự báo, không phải cam kết."
+      },
+      "core_temp": {
+        "name": "Nhiệt độ lõi pin",
+        "hint": "Đo trực tiếp; từ 52°C bắt đầu tính rủi ro."
+      },
+      "cell_sag": {
+        "name": "Cell tụt áp so với nhóm",
+        "hint": "Độ lệch của cell thấp nhất so với trung vị, đã trừ phần phụ thuộc dòng, quy ra % SOC tương đương. Cell rò điện hoặc mất cân bằng nặng lệch ở mọi mức dòng."
+      },
+      "cell_drift": {
+        "name": "Cell đang lệch dần khỏi nhóm",
+        "hint": "Cell thay đổi so với nhóm trong khoảng 25 phút gần đây, giúp bắt đoản mạch ngầm khi độ lệch còn nhỏ."
+      },
+      "weak_cell": {
+        "name": "Cell yếu (nội trở cao hơn các cell khác)",
+        "hint": "Là việc cần bảo trì chứ chưa phải tín hiệu cháy nổ, nên mức tính bị giới hạn."
+      },
+      "cell_voltage_limit": {
+        "name": "Điện áp cell vượt giới hạn",
+        "hint": "Một cell dưới 2,8 V hoặc trên 4,3 V."
+      },
+      "overload_crate": {
+        "name": "Dòng vượt đường cong an toàn theo nhiệt độ",
+        "hint": "Dòng RMS so với dòng liên tục cho phép ở nhiệt độ hiện tại; trên 1 là quá tải."
+      },
+      "hot_charge": {
+        "name": "Sạc khi pin đang nóng",
+        "hint": "Sạc khi lõi trên 45°C làm chai nhanh và tăng rủi ro."
+      },
+      "low_soh": {
+        "name": "Độ chai cao (SOH thấp)",
+        "hint": "SOH ước lượng từ nội trở. Pin yếu dễ nóng hơn nhưng tự nó không phải nguy cơ cháy."
+      }
+    },
+    "readout": {
+      "coreTemp": "Nhiệt lõi",
+      "current": "Dòng (xả dương)",
+      "packVoltage": "Điện áp pack",
+      "soc": "% pin hiện tại (SOC)",
+      "r25": "Nội trở (quy về 25°C)",
+      "soh": "Độ chai pin (SOH)",
+      "eta": "Dự báo chạm 65°C",
+      "heat": "Nhiệt không giải thích được",
+      "etaNone": "Không",
+      "learning": "đang học",
+      "sohClass": {
+        "good": "Tốt: ưu tiên đường dài",
+        "fair": "Trung bình: chặng vừa",
+        "weak": "Yếu: chặng ngắn hoặc bảo dưỡng"
+      }
+    },
+    "charts": {
+      "aria": "Biểu đồ: {{title}}",
+      "axisTime": "Thời gian mô phỏng (phút)",
+      "temperature": "Nhiệt độ lõi: thực tế so với AI dự đoán",
+      "measured": "Thực tế (đo được)",
+      "filtered": "AI lọc (Digital Twin)",
+      "nominal": "AI kỳ vọng nếu pin khỏe",
+      "trueTemp": "Giá trị thật của mô phỏng",
+      "heat": "Nhiệt tỏa ra không giải thích được (W)",
+      "estimatedHeat": "AI ước lượng",
+      "trueHeat": "Nhiệt lỗi thật của mô phỏng",
+      "cells": "Điện áp từng cell: lệch so với trung vị (mV)",
+      "cellsNow": "16 cell tại thời điểm hiện tại (mV so với trung vị)",
+      "cellName": "Cell {{n}}",
+      "risk": "Risk Score theo thời gian, theo đóng góp của từng module",
+      "soh": "Độ chai (SOH): AI ước lượng so với thực tế mô phỏng",
+      "sohEstimated": "AI ước lượng",
+      "sohTrue": "Thực tế của mô phỏng",
+      "current": "Dòng (A)"
+    },
+    "truth": {
+      "toggle": "Hiện giá trị thật của mô phỏng",
+      "hint": "Chỉ có trong mô phỏng, để kiểm chứng AI. Hệ thống thật không có các giá trị này."
+    },
+    "actions": {
+      "title": "Khuyến nghị của AI",
+      "monitor": "Tiếp tục theo dõi",
+      "derate": "Hạ công suất xả {{percent}}%",
+      "swap": "Đổi sang pin mát ở trạm gần nhất",
+      "isolate": "Cách ly viên pin này sau khi đổi",
+      "reduce_charge": "Hạ dòng sạc xuống {{percent}}%",
+      "schedule_maintenance": "Xếp lịch bảo dưỡng hoặc điều sang chặng ngắn"
+    }
+  },
+  "pages": {
+    "story": {
+      "title": "Story Mode",
+      "subtitle": "Hướng dẫn demo 3 phút tự động đi qua Tổng quan, BMS vs Voltify, Can thiệp và ROI, có chú thích từng bước."
+    },
+    "sandbox": {
+      "title": "Sandbox Mode",
+      "subtitle": "Tự thay đổi nhiệt độ môi trường, tải và tiêm lỗi vào một pin bất kỳ để xem Voltify phản ứng."
+    },
+    "fleet": {
+      "title": "Tổng quan (Fleet Command Center)",
+      "subtitle": "Bản đồ pin theo mức rủi ro, KPI của đội pin và danh sách cảnh báo trực tiếp."
+    },
+    "twin": {
+      "title": "Bản sao số (Digital Twin) của pin",
+      "subtitle": "Điện áp từng cell, nhiệt lõi, dòng, nội trở, đường thực tế so với AI dự đoán, và giải thích vì sao Risk Score có giá trị đó."
+    },
+    "bms": {
+      "title": "BMS truyền thống vs Voltify",
+      "subtitle": "Cùng một kịch bản, cùng seed: BMS chỉ ngắt ở 65°C, Voltify cảnh báo sớm (Lead time) và can thiệp."
+    },
+    "vitals": {
+      "title": "Bốn chỉ số sinh hiệu",
+      "subtitle": "% pin hiện tại (SOC), độ chai (SOH), an toàn và rủi ro cháy nổ, hiệu suất xả, mỗi chỉ số kèm giải thích dễ hiểu."
+    },
+    "intervention": {
+      "title": "Cơ chế can thiệp",
+      "subtitle": "Thông báo cho shipper, tủ sạc hạ dòng sạc và nhật ký lệnh gửi xuống xe."
+    },
+    "crossBrand": {
+      "title": "Cross-brand Hub",
+      "subtitle": "Ba nguồn dữ liệu thô với ba định dạng khác nhau, đi qua adapter và hiện trên một màn hình thống nhất."
+    },
+    "roi": {
+      "title": "ROI và Impact Calculator",
+      "subtitle": "Chi phí thay pin tiết kiệm, tuổi thọ kéo dài và thời gian hoàn vốn, công thức và giả định đều chỉnh được."
+    },
+    "evidence": {
+      "title": "Evidence / Validation",
+      "subtitle": "Precision, Recall, tỷ lệ báo động giả và Lead time tính từ mô phỏng, kèm Giới hạn đã biết và Lộ trình."
+    },
+    "market": {
+      "title": "Thị trường và Kinh doanh",
+      "subtitle": "TAM/SAM/SOM, so sánh đối thủ, UVP, Unfair Advantage, mô hình doanh thu và lộ trình."
+    }
+  }
+}
