@@ -1,0 +1,80 @@
+# Builds Voltify and publishes the static site to GitHub Pages.
+#
+# One-time setup in the repository: Settings > Pages > Build and deployment > Source: "GitHub Actions".
+# Optional: Settings > Secrets and variables > Actions > Variables > VITE_TILE_URL, the URL template of a map
+# tile server of your own (for example https://tiles.example.com/{z}/{x}/{y}.png). Left empty, the map uses
+# OpenStreetMap's standard tiles and falls back to a plain grid when they cannot be loaded.
+#
+# The site works from any sub-path (https://<user>.github.io/<repo>/): assets are relative (`base: './'`)
+# and routes are hash routes, so no rewrite rules are needed.
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Test and build
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7
+        with:
+          # Vitest needs Node 22.12 or newer (see "engines" in package.json).
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # The tests include the evaluation behind the Evidence screen (78 simulation suites), so a change that
+      # breaks the AI's behaviour, the physics, a translation or the "no absolute claims" rule stops the deployment.
+      - name: Test
+        run: npm test
+
+      - name: Check that GitHub Pages is set up
+        if: github.event_name != 'pull_request'
+        uses: actions/configure-pages@v6
+
+      - name: Build
+        run: npm run build
+        env:
+          VITE_TILE_URL: ${{ vars.VITE_TILE_URL }}
+
+      - name: Upload the site
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: dist
+
+  deploy:
+    name: Deploy
+    # Pull requests are only tested and built; only a push to main (or a manual run on main) publishes.
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    # Finish a deployment that is already running instead of cancelling it half-way; a newer push waits its turn.
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    permissions:
+      pages: write # to deploy to Pages
+      id-token: write # to verify that the deployment comes from this workflow
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5

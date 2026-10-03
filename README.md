@@ -86,6 +86,7 @@ src/
   workers/      Web Worker và client
 tests/          Vitest (hàm thuần, có seed)
 scripts/        headless.ts, extractNasaPcoe.mjs
+.github/        workflow triển khai GitHub Pages
 ```
 
 ## Kiểm chứng
@@ -116,7 +117,20 @@ Ghi công theo yêu cầu của NASA: *B. Saha and K. Goebel (2007). Battery Dat
 
 - **Vercel**: Framework Preset `Vite`, Build Command `npm run build`, Output Directory `dist`.
 - **Netlify**: Build command `npm run build`, Publish directory `dist`.
-- **GitHub Pages**: đẩy nội dung `dist/` lên nhánh `gh-pages` (hoặc dùng GitHub Actions upload artifact `dist`). Trang chạy được dưới `https://<user>.github.io/<repo>/`.
+- **GitHub Pages**: có sẵn workflow `.github/workflows/deploy.yml`, xem mục dưới.
+
+### GitHub Pages bằng GitHub Actions
+
+Workflow chạy khi push lên `main` (và khi bấm Run workflow thủ công): `npm ci`, `npm test`, `npm run build`, rồi đăng `dist/` lên Pages. Test nằm trước bước đăng, nên một thay đổi làm hỏng AI, vật lý, bản dịch hoặc quy tắc "không tuyên bố tuyệt đối" sẽ chặn việc triển khai. Với pull request vào `main`, workflow chỉ test và build, không đăng.
+
+Thiết lập một lần:
+
+1. Tạo repository trên GitHub, rồi `git remote add origin <url>` và `git push -u origin main`.
+2. Vào **Settings > Pages > Build and deployment > Source** và chọn **GitHub Actions**.
+3. (Tùy chọn) **Settings > Secrets and variables > Actions > Variables**: thêm `VITE_TILE_URL` nếu có máy chủ gạch bản đồ riêng (xem mục offline). Để trống thì bản đồ dùng OpenStreetMap.
+4. Push, hoặc vào tab **Actions** và chạy workflow thủ công. Địa chỉ trang hiện ở job `Deploy` và trong Settings > Pages, dạng `https://<user>.github.io/<repo>/`.
+
+Các action được ghim theo phiên bản chính (`checkout@v7`, `setup-node@v7`, `configure-pages@v6`, `upload-pages-artifact@v5`, `deploy-pages@v5`) và dùng Node 24. Workflow này chưa chạy trên GitHub (repository chưa có remote); các bước `npm ci`, `npm test`, `npm run build` đã được chạy thử trên một bản checkout sạch ở máy.
 
 ### Chạy offline
 
